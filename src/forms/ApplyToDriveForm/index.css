@@ -1,0 +1,44 @@
+
+.form-group label {
+    opacity: 0.5;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .form-group {
+    margin-top: 25px;
+    margin-top: 25px;
+  }
+  
+  .step-description {
+    font-size: 0.9rem;
+  }
+  
+  .back-button {
+    border: none;
+  }
+  
+  .form-control {
+    padding: 10px;
+  }
+  
+  .next-button {
+    border: none;
+  }
+  
+  .control-buttons {
+    width: 65%;
+  }
+  
+  hr {
+    width: 100%;
+  }
+
+  @media (max-width: 998px) {
+    .control-buttons {
+        max-width: 85%;
+        min-width: 85%
+    }
+  }

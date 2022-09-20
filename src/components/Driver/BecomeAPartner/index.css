@@ -1,0 +1,113 @@
+.hero.investor {
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../../../assets/images/investor.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* padding-top: 150px; */
+  padding: 100px 20px;
+}
+
+.our-partners.right {
+  display: flex;
+  justify-content: end;
+  align-items: flex-end;
+}
+
+.our-partners-svg {
+  max-width: 65%;
+  /* margin: 0 auto; */
+}
+
+
+/* HOW IT WORS */
+.how-it-works {
+  padding: 150px 30px 80px;
+  margin: 30px;
+  background-color: #181818;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+
+/* WHY INVEST */
+/* CONTACT SECTION STYLE RULES */
+.why-invest .why-invest-container {
+  margin-top: -110px;
+  /* height: 1000px; */
+  overflow: hidden;
+}
+
+.why-invest .why-invest-container .skew-background {
+  height: 100%;
+  transform: skew(0deg, -5deg);
+  background-color: #181818;
+  color: #fff;
+  margin-top: 9%;
+  /* margin-bottom: 9%; */
+  padding: 200px 50px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.why-invest .why-invest-container .skew-background h2 {
+  text-align: center;
+}
+
+.why-invest .why-invest-content {
+  transform: skew(0deg, 5deg);
+}
+
+.why-invest-content, .skew-background {
+  width: 100%;
+}
+
+.why-invest .feature-group .right{
+  align-items: center;
+}
+.why-invest .feature-group .title {
+  color: #fff !important;
+}
+
+.why-invest .feature-image {
+  /* object-fit: cover; */
+}
+
+.partner .footer {
+  margin-top: -60px !important;
+}
+
+@media (max-width: 998px) {
+  .our-partners-svg {
+    max-width: 45%;
+  }
+
+  .choose-your-vehicle.flipped {
+    flex-direction: column !important;
+  }
+
+  .our-partners.right {
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .why-invest .feature-group {
+    flex-direction: column;
+  }
+
+  .why-invest .feature-group .right, .why-invest .feature-group .left {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .why-invest-content .feature-group:nth-child(3) {
+    flex-direction: column-reverse;
+    margin-top: 370px;
+  }
+}

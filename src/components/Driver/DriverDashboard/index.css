@@ -1,0 +1,222 @@
+.logo {
+  /* max-width: 150px; */
+  min-width: 60%;
+  max-width: 60%;
+}
+
+.dashboard-container {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #181818;
+}
+
+.logo-container.dashboard-logo-container {
+  width: 100%;
+  /* margin-left: 20px; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-nav {
+  height: 100vh;
+  min-width: 20%;
+  max-width: 20%;
+  background-color: #f7f9fe;
+  padding: 30px 10px;
+  position: fixed;
+  top: 0;
+}
+
+.dashboard-nav nav {
+  margin-top: 30%;
+  display: flex;
+  margin-left: 20px;
+  transition: display .3s ease-in;
+}
+
+.dashboard-nav ul li {
+  list-style: none;
+}
+
+.dashboard-nav ul li a {
+  color: #181818;
+  opacity: 0.8;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.dashboard-nav ul {
+  margin: 0;
+  padding: 0;
+}
+
+.category-name {
+  text-transform: uppercase;
+  color: #181818;
+  opacity: 0.3;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.dashboard-nav-category {
+  margin-bottom: 50px;
+}
+
+.dashboard-nav-category ul li {
+  margin-bottom: 20px;
+}
+
+/* MAIN CONTENT FOR DASHBOARDS*/
+.dashboard-main-content {
+  min-width: 80%;
+  width: 80%;
+  position: absolute;
+  right: 0;
+}
+
+.dashboard-main-content::-webkit-scrollbar {
+    width: 0;
+}
+
+
+.dashboard-main-content-top {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  padding: 20px 40px 0;
+}
+
+.user-profile {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f9fe;
+  cursor: pointer;
+}
+
+.user-initials {
+  margin: 0;
+}
+
+.user-identity {
+  padding: 5px 40px;
+}
+
+.dashboard-nav-category-item {
+  color: #f7f9fe;
+}
+
+/* ACCOUNT OVERVIEW */
+.account-overview {
+  padding: 20px 40px 150px;
+}
+
+.form-container > div {
+  width: 70%;
+}
+
+.form-item {
+  width: 100%;
+  margin-right: 20px;
+}
+
+.glass-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  background: rgba(255, 255, 255, .5);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+
+@media (max-width: 998px) {
+  .menu {
+    display: inline-block;
+  }
+
+  .dashboard-main-content {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .dashboard-nav {
+    min-width: 40%;
+    max-width: 40%;
+    z-index: 40;
+    display: none;
+  }
+
+  .dashboard-nav {
+    right: 0;
+  }
+
+  .form-container > div {
+    width: 100%;
+  }
+
+  .compliance-box {
+    width: 100% !important;
+  }
+
+  .dashboard-main-content-top {
+    flex-direction: row-reverse;
+  }
+
+}
+
+@media (min-width: 998px) {
+  .menu {
+    display: none !important;
+  }
+
+  .dashboard-main-content {
+    min-width: 80%;
+    max-width: 80%;
+  }
+
+  .dashboard-nav {
+    min-width: 20%;
+    max-width: 20%;
+    z-index: 40;
+    display: block !important;
+  }
+
+  .dashboard-nav {
+    left: 0;
+  }
+
+  .close-menu {
+    display: none !important;
+  }
+
+  .dashboard-main-content-top {
+    flex-direction: row;
+    justify-content: flex-end !important;
+  }
+}
+
+
+@media (max-width: 576px) {
+  .form-container > div {
+    flex-direction: column;
+  }
+
+  .dashboard-nav {
+    min-width: 60%;
+    max-width: 60%;
+  }
+
+  .payment-top > h5 {
+    font-size: .9rem;
+  }
+}

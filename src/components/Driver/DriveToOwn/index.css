@@ -1,0 +1,133 @@
+.hero.drive-to-own {
+    height: 450px;
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.55)),
+      url("../../../assets/images/drive-to-own.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* padding-top: 150px; */
+    padding: 100px 20px;
+  }
+
+.vehicle-card {
+    width: 370px;
+    height: 470px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: rgb(0 0 0 / 7%) 0px 2px 30px;
+    position: relative;
+    top: 0px;
+    transition: top 0.3s ease 0s, box-shadow 0.3s ease 0s;
+}
+
+.vehicle-card:hover {
+    box-shadow: rgb(0 0 0 / 10%) 0px 6px 80px;
+    top: -4px;
+    cursor: pointer;
+}
+
+.vehicle-details {
+    width: 100%;
+    height: 150px;
+    /* background-color: aqua; */
+}
+
+.transmission, .fuel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transmission p:first-child, .fuel p:first-child {
+    opacity: .5;
+}
+
+.vehicle-imag-container {
+    width: 100%;
+    height: 200px;
+}
+
+.vehicle-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vehicle-card-footer {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.arrow {
+    position: relative;
+    right: 0px;
+    transition: right 0.3s ease-out;
+}
+
+.view-details-link:hover .arrow {
+    right: -6px;
+}
+
+.link-to-vehicle-page {
+    text-decoration: none;
+    color: #000;
+}
+
+.link-to-vehicle-page:hover {
+    color: #000 !important;
+}
+
+.link-to-vehicle-page:visited {
+    color: #000 !important;
+}
+
+.steps-to-own {
+    width: 100%;
+}
+
+.steps-to-own p, .steps-to-own small, .steps-to-own h2 {
+    display: block;
+    text-align: center;
+    font-weight: 600;
+}
+
+.steps-to-own-top {
+    width: 100%;
+}
+
+.step {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 60px;
+}
+
+.steps-to-own-bottom {
+    width: 100%;
+}
+
+.steps-icon {
+    max-width: 120px;
+    min-width: 120px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 998px) {
+    .steps-to-own-bottom {
+        flex-direction: column;
+    }
+
+    .partner-logos {
+        flex-direction: column;
+    }
+
+    .partner-logos img:last-child {
+        margin-top: 40px;
+    }
+
+}

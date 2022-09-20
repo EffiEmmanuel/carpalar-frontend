@@ -1,0 +1,25 @@
+.hero.terms-and-conditions {
+    height: 300px;
+    background: #fff;
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* padding-top: 150px; */
+    padding: 100px 20px;
+  }
+  
+  .hero-content.terms-and-conditions {
+    color: #181818 !important;
+  }
+  
+  .hr-nav {
+    opacity: 0.1;
+  }
+  
+  .terms-and-conditions-container {
+    margin-top: -50px;
+  }
+
+  .terms-and-conditions-container ol li {
+    margin-top: 15px;
+    margin-bottom: 45px;
+  }

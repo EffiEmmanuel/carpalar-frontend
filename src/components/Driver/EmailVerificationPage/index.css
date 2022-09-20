@@ -1,0 +1,11 @@
+.hero.eandp-verification {
+    height: 400px;
+    background: #ffffff;
+    padding: 50px 20px 100px;
+}
+
+.hero-content.eandp-verification > h4, .hero-content.eandp-verification > p{
+    width: 100%;
+    text-align: center;
+    color: #181818 !important;
+  }

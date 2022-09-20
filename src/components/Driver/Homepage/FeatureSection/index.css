@@ -1,0 +1,39 @@
+/* FETURES */
+.feature-group {
+    padding: 10px 30px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 430px;
+}
+
+.feature-group .left, .right {
+    width: 45%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.feature-group .title {
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.feature-image {
+    height: 80%;
+    width: 80%;
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.feature-cta {
+    width: 200px;
+    padding: 15px 35px;
+    border: none;
+    border-radius: 20px;
+    margin-top: 25px;
+    font-weight: 600;
+}

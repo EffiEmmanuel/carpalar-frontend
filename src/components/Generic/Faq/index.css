@@ -1,0 +1,16 @@
+.hero.faq {
+  height: 300px;
+  background: #fff;
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* padding-top: 150px; */
+  padding: 100px 20px;
+}
+
+.hero-content.faq {
+  color: #181818 !important;
+}
+
+.hr-nav {
+  opacity: 0.1;
+}

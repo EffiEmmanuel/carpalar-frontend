@@ -1,0 +1,9 @@
+.footer-nav {
+    width: 35% !important;
+}
+
+@media (max-width: 1050px) {
+    #footer-nav {
+        width: 50% !important;
+    }
+}

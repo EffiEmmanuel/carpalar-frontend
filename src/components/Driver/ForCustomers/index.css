@@ -1,0 +1,157 @@
+.hero {
+  height: 650px;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
+    url("../../../assets/images/hero2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* padding-top: 150px; */
+  padding: 100px 20px;
+}
+
+.hero-content {
+  color: #fff;
+}
+
+.hero-content h1 {
+  font-size: 3.8rem;
+  max-width: 60%;
+  min-width: 45%;
+  font-weight: 700;
+}
+.hero-content h3 {
+  margin: 10px 0;
+  font-size: 1.3rem;
+  max-width: 45%;
+  min-width: 30%;
+  font-weight: 500;
+}
+
+.hero-content p {
+  margin: 10px 0;
+  font-size: 0.9rem;
+  max-width: 35%;
+  min-width: 20%;
+  font-weight: 400;
+  color: #fafafa;
+}
+
+.hero-cta {
+  margin-top: 50px;
+  padding: 20px 40px;
+  border-radius: 30px;
+  border: none;
+  font-weight: 500;
+}
+
+.feature-cta {
+  width: 200px;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 20px;
+  margin-top: 25px;
+  font-weight: 600;
+}
+
+/* CHOOSE YOUR VEHICLE SECTION */
+.choose-your-vehicle {
+  padding: 10px 60px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.choose-your-vehicle .left {
+  width: 40%;
+}
+
+.choose-your-vehicle .right {
+  width: 55%;
+}
+
+.vehicles {
+  width: 100%;
+}
+
+/* STEPS */
+.steps {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.step-icon {
+  max-width: 130px;
+}
+
+.partner-logo {
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+}
+
+@media (max-width: 998px) {
+  .hero-content h1 {
+    font-size: 3rem;
+  }
+  .hero-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .hero-content p {
+    font-size: 0.8rem;
+  }
+
+  .choose-your-vehicle {
+    flex-direction: column-reverse;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 100px;
+    margin-bottom: 100px;
+  }
+
+  .choose-your-vehicle .right,
+  .choose-your-vehicle .left {
+    width: 100%;
+  }
+
+  .choose-your-vehicle .left {
+    margin-top: 40px;
+  }
+}
+
+@media (max-width: 567px) {
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .hero-content h1 {
+    text-align: center;
+    max-width: 100%;
+    width: 100%;
+    min-width: 100% !important;
+  }
+  .hero-content h3 {
+    max-width: 100%;
+    width: 100%;
+    min-width: 100% !important;
+  }
+
+  .hero-content p {
+    max-width: 100%;
+    width: 100%;
+    min-width: 100% !important;
+  }
+}

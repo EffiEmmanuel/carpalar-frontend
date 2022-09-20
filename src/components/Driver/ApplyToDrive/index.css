@@ -1,0 +1,98 @@
+.apply-to-drive-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.apply-to-drive-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 35%;
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("../../../assets/images/feature1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* padding-top: 150px; */
+  padding: 100px 30px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.apply-header {
+  font-size: 3.6rem;
+}
+
+.apply-description p {
+  font-size: 1.2rem;
+}
+
+.apply-step {
+  width: 55%;
+  min-width: 55%;
+  max-width: 55%;
+}
+
+.apply-to-drive-right {
+  position: absolute;
+  right: 0;
+  padding: 230px 30px;
+  height: 100%;
+  width: 65%;
+}
+
+.apply-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 4px;
+  margin-bottom: 70px;
+  margin-top: -80px;
+}
+
+.apply-steps {
+  width: calc(100%/3.5);
+  margin: 5px;
+  padding: 2px;
+  position: relative;
+}
+
+.step-1::after, .step-2::after {
+  position: absolute;
+  margin-top: 10px;
+  font-size: .9rem;
+}
+
+.step-1::after {
+  content: '01 - Personal info';
+}
+
+.step-2::after {
+  content: '02 - Professional info';
+}
+
+
+@media (max-width: 998px) {
+  .apply-to-drive-left {
+    display: none;
+  }
+
+  .apply-to-drive-right {
+    width: 100%;
+  }
+
+  .apply-step {
+    max-width: 85%;
+    min-width: 85%;
+  }
+
+  .apply-steps {
+    width: calc(100% / 2);
+  }
+}
