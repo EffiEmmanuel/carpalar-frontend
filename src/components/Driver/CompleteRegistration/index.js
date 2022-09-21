@@ -21,7 +21,7 @@ function CompleteRegistration() {
 
   return (
     <div className="apply-to-drive-container">
-      <div className="apply-to-drive-left">
+      <div className="apply-to-drive-left complete-registration">
         {/* LOGO HERE */}
         <div className="logo-container">
           <img src={carpalarLogo} alt="Carpalar" className="nav-logo" />

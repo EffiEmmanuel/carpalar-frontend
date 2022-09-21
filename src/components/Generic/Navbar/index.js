@@ -11,6 +11,7 @@ function Navbar() {
     useContext(CarpalarContext);
 
   const [mobileMenuVisibility, setMobileMenuVisibility] = useState("none");
+  const [mobileMenuOpacity, setMobileMenuOpacity] = useState("0");
 
   return (
     <>
@@ -150,7 +151,10 @@ function Navbar() {
         {/* MOBILE NAV ICON */}
         <div
           className="menu-icon"
-          onClick={() => setMobileMenuVisibility("flex")}
+          onClick={() => {
+            setMobileMenuVisibility("flex");
+            setMobileMenuOpacity('1')
+          }}
         >
           <List size={40} />
         </div>
@@ -161,6 +165,8 @@ function Navbar() {
           id="carpalar-mobile-navbar"
           style={{
             display: mobileMenuVisibility,
+            opacity: mobileMenuOpacity,
+            transition: 'opacity .5s ease-in-out'
           }}
         >
           <div

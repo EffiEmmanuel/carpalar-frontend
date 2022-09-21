@@ -1,0 +1,15 @@
+#verification-container {
+  width: 30% !important;
+}
+
+@media (max-width: 998px) {
+  #verification-container {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 576px) {
+  #verification-container {
+    width: 100% !important;
+  }
+}

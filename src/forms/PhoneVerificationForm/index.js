@@ -1,4 +1,5 @@
 import axios from "axios";
+import "./index.css";
 import { useFormik } from "formik";
 import React from "react";
 import { useState } from "react";
@@ -30,18 +31,20 @@ function PhoneVerificationForm({ isLogin2FA, driver_id }) {
       .get(`http://localhost:5000/driver/resend-otp?driverId=${driverId}`)
       .then((res) => {
         console.log("RES:", res);
-        Swal.fire({
-          title: "Sent",
-          text: "A new code has been sent to your registered phone number",
-          icon: "success",
-          timer: "3000",
-        });
+        if (res.data) {
+          Swal.fire({
+            title: "Sent",
+            text: "A new code has been sent to your registered phone number",
+            icon: "success",
+            timer: "3000",
+          });
+        }
       })
       .catch((err) => {
         console.log("RES:", err);
         Swal.fire({
           title: "Error",
-          text: err.message,
+          text: err.response.data.messagep,
           icon: "error",
           timer: "3000",
         });
@@ -113,7 +116,7 @@ function PhoneVerificationForm({ isLogin2FA, driver_id }) {
           });
           setIsSubmitting(false);
 
-          localStorage.setItem('driverToken', `${res.data.driverToken}`)
+          localStorage.setItem("driverToken", `${res.data.driverToken}`);
           navigator("/driver/dashboard");
         })
         .catch((err) => {
@@ -169,7 +172,7 @@ function PhoneVerificationForm({ isLogin2FA, driver_id }) {
       onSubmit={handleSubmit}
       className="form-container container-fluid d-flex flex-column justify-content-center align-items-center"
     >
-      <div className="form-group">
+      <div className="form-group" id="verification-container">
         <label htmlFor="verificationCode">Phone verification code</label>
         <input
           id="verificationCode"
@@ -179,6 +182,7 @@ function PhoneVerificationForm({ isLogin2FA, driver_id }) {
           value={values.verificationCode}
           onChange={handleChange}
           onBlur={handleBlur}
+          maxLength={6}
         />
       </div>
       <div className="d-flex flex-column-reverse justify-content-center align-items-center">

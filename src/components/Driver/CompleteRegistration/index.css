@@ -1,0 +1,17 @@
+.apply-to-drive-left.complete-registration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 35%;
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+      url("../../../assets/images/complete-registration.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    /* padding-top: 150px; */
+    padding: 100px 30px;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }

@@ -3,11 +3,11 @@ import React from "react";
 import { useState } from "react";
 import { ArrowLeft } from "react-bootstrap-icons";
 import "./index.css";
-import makeAPICall from "../../helpers/makeAPICall.js";
-import ApplyToDriveFormSchema from "./validation";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
+import CompleteRegistrationSchema from "./validation";
+import { useEffect } from "react";
 
 function CompleteRegistrationForm({
   isStepOne,
@@ -17,6 +17,27 @@ function CompleteRegistrationForm({
 }) {
   const navigator = useNavigate();
 
+  const [vehicles, setVehicles] = useState();
+  const [fetchVehiclesError, setFetchVehiclesError] = useState();
+
+  // Get user token: USED TO MAKE SECURE API CALL
+  useEffect(() => {
+    async function getAllVehicles() {
+      await axios
+        .get(`http://localhost:5000/vehicles`)
+        .then((res) => {
+          console.log("RES:", res);
+          if (res.data.vehicles) {
+            setVehicles(res.data.vehicles);
+          }
+        })
+        .catch((err) => {
+          console.log("ERR:", err);
+        });
+    }
+
+    getAllVehicles();
+  });
   const token = localStorage.getItem("userToken");
 
   const onSubmit = async (values, actions) => {
@@ -60,29 +81,30 @@ function CompleteRegistrationForm({
     isSubmitting,
   } = useFormik({
     initialValues: {
-      name: "",
-      othername: "",
-      surname: "",
-      gender: "",
-      address: "",
-      phone: "",
-      jobTitle: "",
-      email: "",
-      password: "",
-      dateOfBirth: "",
-      placeOfBirth: "",
-      maritalStatus: "",
-      occupation: "",
-      yearsOfDrivingExperience: "",
-      nationality: "",
-      highestAcademicQualification: "",
-      stateOfOrigin: "",
-      lga: "",
-      driversLicense: "",
-      otherHailingPlatforms: "",
-      termsAndConditions: "",
+      guarantorOneName: "",
+      guarantorOneRelationship: "",
+      guarantorOnePhone: "",
+      guarantorOneAddress: "",
+      guarantorOneJobTitle: "",
+      guarantorOneEmail: "",
+      guarantorOneNin: "",
+      guarantorOneBvn: "",
+
+      guarantorTwoName: "",
+      guarantorTwoRelationship: "",
+      guarantorTwoPhone: "",
+      guarantorTwoAddress: "",
+      guarantorTwoJobTitle: "",
+      guarantorTwoEmail: "",
+      guarantorTwoNin: "",
+      guarantorTwoBvn: "",
+
+      vehicle: "",
+      comfortableContractDuration: "",
+      downpaymentBudget: "",
+      otherPaymentAmount: "",
     },
-    validationSchema: ApplyToDriveFormSchema,
+    validationSchema: CompleteRegistrationSchema,
     onSubmit,
   });
 
@@ -108,173 +130,281 @@ function CompleteRegistrationForm({
         <h5>Guatantor 1</h5>
 
         <div className="form-group mt-3">
-          <label htmlFor="name">name</label>
+          <label htmlFor="guarantorOneName">name</label>
           <input
             type="text"
-            id="name"
+            id="guarantorOneName"
             className="form-control"
-            name="name"
-            value={values.name}
+            name="guarantorOneName"
+            value={values.guarantorOneName}
             placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.name && <p className="error">{errors.name}</p>}
+          {errors.guarantorOneName && (
+            <p className="error">{errors.guarantorOneName}</p>
+          )}
         </div>
         <div className="form-group">
-          <label htmlFor="relationship">relationship</label>
+          <label htmlFor="guarantorOneRelationship">relationship</label>
           <input
             type="text"
-            id="relationship"
+            id="guarantorOneRelationship"
             className="form-control"
-            name="relationship"
-            value={values.relationship}
-            placeholder="eg. Jane"
+            name="guarantorOneRelationship"
+            value={values.guarantorOneRelationship}
+            placeholder="eg. Brother"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.relationship && <p className="error">{errors.relationship}</p>}
+          {errors.guarantorOneRelationship && (
+            <p className="error">{errors.guarantorOneRelationship}</p>
+          )}
         </div>
         <div className="form-group">
-          <label htmlFor="phone">phone</label>
+          <label htmlFor="guarantorOnePhone">phone</label>
           <input
             type="tel"
-            id="phone"
+            id="guarantorOnePhone"
             className="form-control"
-            name="phone"
-            value={values.phone}
+            name="guarantorOnePhone"
+            value={values.guarantorOnePhone}
             placeholder="eg. +234"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.phone && <p className="error">{errors.phone}</p>}
+          {errors.guarantorOnePhone && (
+            <p className="error">{errors.guarantorOnePhone}</p>
+          )}
         </div>
         <div className="form-group">
-          <label htmlFor="address">home address</label>
+          <label htmlFor="guarantorOneAddress">home address</label>
           <input
             type="text"
-            id="address"
+            id="guarantorOneAddress"
             className="form-control"
-            name="address"
-            value={values.address}
+            name="guarantorOneAddress"
+            value={values.guarantorOneAddress}
             placeholder="eg. 123 example street..."
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.address && <p className="error">{errors.address}</p>}
+          {errors.guarantorOneAddress && (
+            <p className="error">{errors.guarantorOneAddress}</p>
+          )}
         </div>
-
         <div className="form-group">
-          <label htmlFor="jobTitle">Job title</label>
+          <label htmlFor="guarantorOneJobTitle">Job title</label>
           <input
             type="tel"
-            id="jobTitle"
+            id="guarantorOneJobTitle"
             className="form-control"
-            name="jobTitle"
-            value={values.jobTitle}
+            name="guarantorOneJobTitle"
+            value={values.guarantorOneJobTitle}
             placeholder="eg. +234"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.jobTitle && <p className="error">{errors.jobTitle}</p>}
+          {errors.guarantorOneJobTitle && (
+            <p className="error">{errors.guarantorOneJobTitle}</p>
+          )}
         </div>
         <div className="form-group">
-          <label htmlFor="email">email</label>
+          <label htmlFor="guarantorOneEmail">email</label>
           <input
             type="email"
-            id="email"
+            id="guarantorOneEmail"
             className="form-control"
-            name="email"
-            value={values.email}
+            name="guarantorOneEmail"
+            value={values.guarantorOneEmail}
             placeholder="eg. johndoe@example.com"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.email && <p className="error">{errors.email}</p>}
+          {errors.guarantorOneEmail && (
+            <p className="error">{errors.guarantorOneEmail}</p>
+          )}
         </div>
         <div className="form-group">
-          <label htmlFor="nin">nin</label>
+          <label htmlFor="guarantorOneNin">nin</label>
           <input
             type="text"
-            id="password"
+            id="guarantorOneNin"
             className="form-control"
-            name="password"
-            value={values.password}
+            name="guarantorOneNin"
+            value={values.guarantorOneNin}
             placeholder="********"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.password && <p className="error">{errors.password}</p>}
+          {errors.guarantorOneNin && (
+            <p className="error">{errors.guarantorOneNin}</p>
+          )}
         </div>
-
         <div className="form-group">
-          <label htmlFor="dateOfBirth">date of birth</label>
-          <input
-            type="date"
-            id="dateOfBirth"
-            className="form-control"
-            name="dateOfBirth"
-            value={values.dateOfBirth}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.dateOfBirth && <p className="error">{errors.dateOfBirth}</p>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="placeOfBirth">place of birth</label>
+          <label htmlFor="guarantorOneBvn">bvn</label>
           <input
             type="text"
-            id="placeOfBirth"
+            id="guarantorOneBvn"
             className="form-control"
-            name="placeOfBirth"
-            value={values.placeOfBirth}
-            placeholder="eg. Somewhere beautiful..."
+            name="guarantorOneBvn"
+            value={values.guarantorOneBvn}
+            placeholder="********"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.placeOfBirth && (
-            <p className="error">{errors.placeOfBirth}</p>
+          {errors.guarantorOneBvn && (
+            <p className="error">{errors.guarantorOneBvn}</p>
           )}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="maritalStatus">marital status</label>
-          <select
+        <hr className="hr-opacity mt-5" />
+        <h5>Guatantor 2</h5>
+
+        <div className="form-group mt-3">
+          <label htmlFor="guarantorTwoName">name</label>
+          <input
+            type="text"
+            id="guarantorTwoName"
             className="form-control"
-            id="maritalStatus"
-            name="maritalStatus"
-            value={values.maritalStatus}
+            name="guarantorTwoName"
+            value={values.guarantorTwoName}
+            placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
-          >
-            <option value="" disabled={isSubmitting}>
-              Select
-            </option>
-            {/* <option value={maritalStatus[0]} disabled={isSubmitting}>
-              {maritalStatus[0]}
-            </option>
-            <option value={maritalStatus[1]} disabled={isSubmitting}>
-              {maritalStatus[1]}
-            </option>
-            <option value={maritalStatus[2]} disabled={isSubmitting}>
-              {maritalStatus[2]}
-            </option> */}
-          </select>
+          />
+          {errors.guarantorTwoName && (
+            <p className="error">{errors.guarantorTwoName}</p>
+          )}
         </div>
-        {errors.maritalStatus && (
-          <p className="error">{errors.maritalStatus}</p>
-        )}
+        <div className="form-group">
+          <label htmlFor="guarantorTwoRelationship">relationship</label>
+          <input
+            type="text"
+            id="guarantorTwoRelationship"
+            className="form-control"
+            name="guarantorTwoRelationship"
+            value={values.guarantorTwoRelationship}
+            placeholder="eg. Sister"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoRelationship && (
+            <p className="error">{errors.guarantorTwoRelationship}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoPhone">phone</label>
+          <input
+            type="tel"
+            id="guarantorTwoPhone"
+            className="form-control"
+            name="guarantorTwoPhone"
+            value={values.guarantorTwoPhone}
+            placeholder="eg. +234"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoPhone && (
+            <p className="error">{errors.guarantorTwoPhone}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoAddress">home address</label>
+          <input
+            type="text"
+            id="guarantorTwoAddress"
+            className="form-control"
+            name="guarantorTwoAddress"
+            value={values.guarantorTwoAddress}
+            placeholder="eg. 123 example street..."
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoAddress && (
+            <p className="error">{errors.guarantorTwoAddress}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoJobTitle">Job title</label>
+          <input
+            type="text"
+            id="guarantorTwoJobTitle"
+            className="form-control"
+            name="guarantorTwoJobTitle"
+            value={values.guarantorTwoJobTitle}
+            placeholder="eg. Banker"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoJobTitle && (
+            <p className="error">{errors.guarantorTwoJobTitle}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoEmail">email</label>
+          <input
+            type="email"
+            id="guarantorTwoEmail"
+            className="form-control"
+            name="guarantorTwoEmail"
+            value={values.guarantorTwoEmail}
+            placeholder="eg. johndoe@example.com"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoEmail && (
+            <p className="error">{errors.guarantorTwoEmail}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoNin">nin</label>
+          <input
+            type="text"
+            id="guarantorTwoNin"
+            className="form-control"
+            name="guarantorTwoNin"
+            value={values.guarantorTwoNin}
+            placeholder="********"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoNin && (
+            <p className="error">{errors.guarantorTwoNin}</p>
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="guarantorTwoBvn">bvn</label>
+          <input
+            type="text"
+            id="guarantorTwoBvn"
+            className="form-control"
+            name="guarantorTwoBvn"
+            value={values.guarantorTwoBvn}
+            placeholder="********"
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoBvn && (
+            <p className="error">{errors.guarantorTwoBvn}</p>
+          )}
+        </div>
       </div>
 
       <div
@@ -284,21 +414,50 @@ function CompleteRegistrationForm({
           flexDirection: "column",
         }}
       >
-        <h2 className="semibold">Now, let's take your professional details</h2>
+        <h2 className="semibold">
+          Now, let's take your car and payment details
+        </h2>
         <p className="step-description">
-          Please fill in your details and our team will get back to you in 72
-          hours.
+          Please select your desired car and pick a payment plan most suitable
+          for you.
         </p>
 
         {/* OCCUPATION */}
         <div className="form-group mt-5">
-          <label htmlFor="occupation">occupation</label>
+          <label htmlFor="vehicle">choose your vehicle</label>
 
           <select
             className="form-control"
-            id="occupation"
-            name="occupation"
-            value={values.occupation}
+            id="vehicle"
+            name="vehicle"
+            value={values.vehicle}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          >
+            <optgroup>
+              <option value="" disabled={isSubmitting}>
+                Select vehicle
+              </option>
+            </optgroup>
+          </select>
+          {errors.vehicle && <p className="error">{errors.vehicle}</p>}
+        </div>
+
+        {!values.vehicle === "" && (
+          <div className="form-group">
+            <a href="/">SEE DETAILS</a>
+          </div>
+        )}
+
+        {/* COMFORTABLE CONTRACT DURATION */}
+        <div className="form-group mt-5">
+          <label htmlFor="comfortableContractDuration">Contract duration</label>
+          <select
+            className="form-control"
+            id="comfortableContractDuration"
+            name="comfortableContractDuration"
+            value={values.comfortableContractDuration}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
@@ -307,255 +466,62 @@ function CompleteRegistrationForm({
               <option value="" disabled={isSubmitting}>
                 Select
               </option>
-              {/* {occupation.map((occupation, index) => (
-                <option key={index} value={occupation} disabled={isSubmitting}>
-                  {occupation}
-                </option>
-              ))} */}
+              <option value="24 month">24 Month</option>
+              <option value="27 month">27 Month</option>
             </optgroup>
           </select>
-          {errors.occupation && <p className="error">{errors.occupation}</p>}
-        </div>
-
-        {/* YEARS OF DRIVING EXPERIENCE */}
-        <div className="form-group mt-5">
-          <label htmlFor="yearsOfDrivingExperience">
-            years of Driving Experience
-          </label>
-          <input
-            type="number"
-            id="yearsOfDrivingExperience"
-            className="form-control"
-            name="yearsOfDrivingExperience"
-            value={values.yearsOfDrivingExperience}
-            placeholder="eg. 2"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.yearsOfDrivingExperience && (
-            <p className="error">{errors.yearsOfDrivingExperience}</p>
+          {errors.comfortableContractDuration && (
+            <p className="error">{errors.comfortableContractDuration}</p>
           )}
         </div>
 
-        {/* COUNTRY */}
-        {/* <div className="form-group">
-              <label htmlFor="country">Country</label>
-              <select
-                className="form-control"
-                id="country"
-                name="country"
-                value={values.country}
-                onChange={handleChange}
-                onBlur={handleBlur}
-              >
-                <optgroup>
-                  <option value="">
-                    Select
-                  </option>
-                  {countries.map((country, index) => (
-                    <option key={index} value={country}>
-                      {country}
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
-            </div> */}
-
-        {/* NATIONALITY */}
-        <div className="form-group">
-          <label htmlFor="nationality">Nationality</label>
-          <input
-            type="text"
-            id="nationality"
-            className="form-control"
-            name="nationality"
-            value={values.nationality}
-            placeholder="eg. Germany"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.nationality && <p className="error">{errors.nationality}</p>}
-        </div>
-
-        {/* CITY */}
-        {/* <div className="form-group">
-              <label htmlFor="city">City</label>
-              <input
-                type="text"
-                id="city"
-                className="form-control"
-                name="city"
-                value={values.city}
-                placeholder="eg. Lagos"
-                onChange={handleChange}
-                onBlur={handleBlur}
-              />
-            </div> */}
-
-        {/* HIGHEST ACADEMIC QUALIFICATION */}
-        <div className="form-group">
-          <label htmlFor="highestAcademicQualification">
-            Highest academic qualification
-          </label>
+        {/* DOWN PAYMENT BUDGET */}
+        <div className="form-group mt-5">
+          <label htmlFor="downpaymentBudget">Down payment budget</label>
           <select
-            name="highestAcademicQualification"
-            value="male"
             className="form-control"
+            id="downpaymentBudget"
+            name="downpaymentBudget"
+            value={values.downpaymentBudget}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           >
-            <option value="" disabled>
-              Select
-            </option>
-            <option value="phd" disabled>
-              PhD
-            </option>
-            <option value="msc" disabled>
-              Masters's Degree
-            </option>
-            <option value="bsc" disabled>
-              Bachelor's Degree
-            </option>
-            <option value="ssce" disabled>
-              SSCE / O Level
-            </option>
+            <optgroup>
+              <option value="" disabled={isSubmitting}>
+                Select
+              </option>
+              <option value="400000">₦400,000</option>
+              <option value="500,000">₦500,000</option>
+              <option value="700,000">₦700,000</option>
+              <option value="1,000,000">₦1,000,000</option>
+              <option value="other">Other</option>
+            </optgroup>
           </select>
-          {errors.highestAcademicQualification && (
-            <p className="error">{errors.highestAcademicQualification}</p>
+          {errors.downpaymentBudget && (
+            <p className="error">{errors.downpaymentBudget}</p>
           )}
         </div>
 
-        {/* STATE OF ORIGIN */}
-        <div className="form-group">
-          <label htmlFor="stateOfOrigin">state Of Origin</label>
-          <input
-            type="text"
-            id="stateOfOrigin"
-            className="form-control"
-            name="stateOfOrigin"
-            value={values.stateOfOrigin}
-            placeholder="eg. Ogun state"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.stateOfOrigin && (
-            <p className="error">{errors.stateOfOrigin}</p>
-          )}
-        </div>
-
-        {/* LGA */}
-        <div className="form-group">
-          <label htmlFor="lga">LGA</label>
-          <input
-            type="text"
-            id="lga"
-            className="form-control"
-            name="lga"
-            value={values.lga}
-            placeholder="eg. Iba"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.lga && <p className="error">{errors.lga}</p>}
-        </div>
-
-        {/* DRIVER'S LICENSE */}
-        <div className="form-group">
-          <label htmlFor="driversLicense">Driver's License</label>
-          <input
-            type="file"
-            accept=".pdf, .png, .jpg"
-            id="driversLicense"
-            className="form-control"
-            name="driversLicense"
-            value={values.driversLicense}
-            // onChange={(e) => {
-            //   handleChange(e);
-            //   const driversLicese = e.target.files[0];
-            //   setFile(driversLicese);
-            // }}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.driversLicense && (
-            <p className="error">{errors.driversLicense}</p>
-          )}
-        </div>
-
-        {/* OTHER HAILING PLATFORMS */}
-        <div className="form-group">
-          <label>
-            Are you currently driving for any ride-hailing platforms? (eg. Uber
-            or Taxify){" "}
-          </label>
-          <div className="radio-group d-flex align-items-center mt-2">
-            <input
-              type="radio"
-              id="otherHailingPlatformsYes"
-              className="me-2"
-              name="otherHailingPlatforms"
-              //   value={values.otherHailingPlatforms}
-              value="yes"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={isSubmitting}
-            />
-            <label htmlFor="otherHailingPlatformsYes">Yes</label>
-          </div>
-
-          <div className="radio-group d-flex align-items-center mt-2">
-            <input
-              type="radio"
-              id="otherHailingPlatformsNo"
-              className="me-2"
-              name="otherHailingPlatforms"
-              //   value={values.otherHailingPlatforms
-              value="no"
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={isSubmitting}
-            />
-            <label htmlFor="otherHailingPlatformsNo">No</label>
-          </div>
-
-          {errors.otherHailingPlatforms && (
-            <p className="error">{errors.otherHailingPlatforms}</p>
-          )}
-        </div>
-
-        {/* AGREE TO TERMS AND CONDITIONS */}
-        <div className="form-group">
-          <div className="radio-group d-flex align-items-center mt-2">
-            <input
-              type="checkbox"
-              className="me-2"
-              id="termsAndConditions"
-              value={values.termsAndConditions}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              disabled={isSubmitting}
-            />
-            <label htmlFor="termsAndConditions">
-              I agree to{" "}
-              <a className="blue-text d-inline" href="/terms-and-conditions">
-                Terms & Conditions{" "}
-              </a>
-              and{" "}
-              <a className="blue-text d-inline" href="/privacy-policy">
-                Privacy Policy
-              </a>
-              .
+        {values.downpaymentBudget === "other" && (
+          <div className="form-group mt-5">
+            <label htmlFor="downpaymentBudget">
+              Please provide amount below
             </label>
+            <input
+              type="text"
+              name="otherPaymentAmount"
+              id="otherPaymentAmount"
+              className="form-control"
+              value={values.otherPaymentAmount}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+            {errors.otherPaymentAmount && (
+              <p className="error">{errors.otherPaymentAmount}</p>
+            )}
           </div>
-          {errors.termsAndConditions && (
-            <p className="error">{errors.termsAndConditions}</p>
-          )}
-        </div>
+        )}
       </div>
 
       <div className="control-buttons py-5">
