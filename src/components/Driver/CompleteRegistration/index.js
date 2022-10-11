@@ -30,7 +30,7 @@ function CompleteRegistration() {
         <div className="apply-description">
           <h1 className="bold apply-header">Welcome to Carpalar</h1>
           <p>
-            Let's help you complete your registration and get you setup to own your own car.
+            Let's help you complete your registration and get you setup to own your car.
           </p>
         </div>
         <div className="">
@@ -62,13 +62,13 @@ function CompleteRegistration() {
             style={{
               opacity: isStepTwo ? "0.5" : "1",
             }}
-            className="apply-steps blue-bg step-1"
+            className="apply-steps complete-registration blue-bg step-1"
           ></div>
           <div
             style={{
               opacity: isStepOne ? "0.5" : "1",
             }}
-            className="apply-steps blue-bg step-2"
+            className="apply-steps complete-registration blue-bg step-2"
           ></div>
 
           <div

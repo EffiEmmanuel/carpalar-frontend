@@ -63,8 +63,8 @@ function DriverLoginForm() {
         {errors.password && <small className="error">{errors.password}</small>}
       </div>
 
-      <button className="btn btn-dark blue-bg border-none px-4 py-2 mt-4">
-        Log in
+      <button className="btn btn-dark blue-bg border-none px-4 py-2 mt-4" disabled={isSubmitting}>
+        {isSubmitting ? <span>Loading...</span> : <span>Log in</span>}
       </button>
       <small className="">
         <a href="/driver/forgot-password" className="nav-link mt-3">

@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import CompleteRegistrationSchema from "./validation";
 import { useEffect } from "react";
+import jwtDecode from "jwt-decode";
 
 function CompleteRegistrationForm({
   isStepOne,
@@ -37,40 +38,100 @@ function CompleteRegistrationForm({
     }
 
     getAllVehicles();
-  });
-  const token = localStorage.getItem("userToken");
+  }, []);
+  const token = localStorage.getItem("driverToken");
+  const decodedDriver = jwtDecode(token);
 
-  const onSubmit = async (values, actions) => {
+  const onSubmit = async (values) => {
+    const guarantorOne = {
+      name: values.guarantorOneName,
+      relationship: values.guarantorOneRelationship,
+      phone: values.guarantorOnePhone,
+      address: values.guarantorOneAddress,
+      jobTitle: values.guarantorOneJobTitle,
+      email: values.guarantorOneEmail,
+      nin: values.guarantorOneNin,
+      bvn: values.guarantorOneBvn,
+    };
+
+    const guarantorTwo = {
+      name: values.guarantorTwoName,
+      relationship: values.guarantorTwoRelationship,
+      phone: values.guarantorTwoPhone,
+      address: values.guarantorTwoAddress,
+      jobTitle: values.guarantorTwoJobTitle,
+      email: values.guarantorTwoEmail,
+      nin: values.guarantorTwoNin,
+      bvn: values.guarantorTwoBvn,
+    };
+
+    console.log("VALUES:", values);
+    console.log("GONE:", guarantorOne);
+    console.log("GTWO:", guarantorTwo);
+
     await axios
-      .post("http://localhost:5000/driver/register", values, {
-        headers: {
-          "auth-token": `Bearer ${token}`,
+      .patch(
+        `http://localhost:5000/driver/complete-registration?driverId=${decodedDriver._id}`,
+        {
+          guarantorOne,
+          guarantorTwo,
+          vehicle: values.vehicle,
+          comfortableContractDuration: values.comfortableContractDuration,
+          downpaymentBudget: values.downpaymentBudget,
+          otherPaymentAmount: values.otherPaymentAmount,
         },
-      })
+        {
+          headers: {
+            "authToken": `Bearer ${token}`,
+          },
+        }
+      )
       .then((res) => {
         Swal.fire({
-          title: "We have received your details!",
-          text: "We will get back to you within 72 hours.",
+          title: "Congratulations!🎉",
+          text: "Your application has been completed successfully.",
           icon: "success",
           timer: 4000,
         });
         console.log("RES:", res);
 
-        navigator(`/driver/${res.data.driverId}/verify-phone`);
+        // navigator('/driver/dashboard');
       })
       .catch((err) => {
+        if (err.response.data.message === "Token required!") {
+          Swal.fire({
+            title: "Error",
+            text: 'Session timeout. Please log in again.',
+            icon: "error",
+            timer: 3000,
+          });
+
+          navigator('/driver/login')
+          return
+        }
+
         Swal.fire({
           title: "Error",
           text: err.response.data.message,
           icon: "error",
           timer: 3000,
         });
+
         console.log("Error:", err);
         console.log("Error response:", err.response);
         console.log("Error data:", err.response.data.message);
         return true;
       });
   };
+
+  const checkBvn = async (e, indicator) => {
+    console.log('BVN:', e.target.value)
+    console.log('INDICATOR:', indicator)
+    if(e.target.value.length === 11) {
+      e.target.disabled = 'true'
+      console.log('11 characters reached')
+    }
+  }
 
   const {
     values,
@@ -140,7 +201,7 @@ function CompleteRegistrationForm({
             placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled={isSubmitting}
+            disabled={true}
           />
           {errors.guarantorOneName && (
             <p className="error">{errors.guarantorOneName}</p>
@@ -205,7 +266,7 @@ function CompleteRegistrationForm({
             className="form-control"
             name="guarantorOneJobTitle"
             value={values.guarantorOneJobTitle}
-            placeholder="eg. +234"
+            placeholder="eg. Lawyer"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
@@ -256,8 +317,12 @@ function CompleteRegistrationForm({
             className="form-control"
             name="guarantorOneBvn"
             value={values.guarantorOneBvn}
+            maxLength={11}
             placeholder="********"
-            onChange={handleChange}
+            onChange={(e) => {
+              handleChange(e)
+              checkBvn(e, 'G1')
+            }}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
@@ -439,14 +504,25 @@ function CompleteRegistrationForm({
               <option value="" disabled={isSubmitting}>
                 Select vehicle
               </option>
+              {vehicles?.map((vehicle) => (
+                <option key={vehicle?._id} value={`${vehicle?._id}`}>
+                  {vehicle?.name}
+                </option>
+              ))}
             </optgroup>
           </select>
           {errors.vehicle && <p className="error">{errors.vehicle}</p>}
         </div>
 
-        {!values.vehicle === "" && (
+        {!values.vehicle == "" && (
           <div className="form-group">
-            <a href="/">SEE DETAILS</a>
+            <a
+              href={`/explore-cars/${values.vehicle}`}
+              rel="noreferrer"
+              target="_blank"
+            >
+              SEE VEHICLE DETAILS
+            </a>
           </div>
         )}
 
@@ -571,6 +647,7 @@ function CompleteRegistrationForm({
                 type="submit"
                 className="btn btn-dark blue-bg py-2 px-4 next-button"
                 disabled={isSubmitting}
+                onClick={() => onSubmit(values)}
               >
                 {isSubmitting && (
                   <span>

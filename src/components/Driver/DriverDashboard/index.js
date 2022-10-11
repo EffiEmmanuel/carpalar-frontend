@@ -64,12 +64,12 @@ function DriverDashboard() {
 
   return (
     <>
-      {/* {!decodedDriver?.isAccountApproved && (
+      {!decodedDriver?.isAccountApproved && (
         <div className="glass-box d-flex flex-column justify-content-center align-items-center">
           <Lock size={30} />
           <h4 className="mt-2">Your account has not been approved.</h4>
         </div>
-      )} */}
+      )}
       {!decodedDriver?.isAccountApproved &&
         !decodedDriver?.isApplicationComplete && (
           <div className="glass-box d-flex flex-column justify-content-center align-items-center">

@@ -14,6 +14,8 @@ import Login from "./components/Driver/Login";
 import Login2FA from "./components/Driver/Login/Login2FA";
 import DriverDashboard from "./components/Driver/DriverDashboard";
 import CompleteRegistration from "./components/Driver/CompleteRegistration";
+import CarDetail from "./components/Driver/ExploreCars/CarDetail";
+import AdminDashboard from "./components/Admin/AdminDashboard";
 
 export const CarpalarContext = createContext(null);
 
@@ -40,6 +42,7 @@ function App() {
           <Route path="/" element={<Homepage />} />
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/explore-cars" element={<ExploreCars />} />
+          <Route path="/explore-cars/:carId" element={<CarDetail />} />
           <Route path="/drive-to-own" element={<DriveToOwn />} />
           <Route path="/apply-to-drive" element={<ApplyToDrive />} />
           <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
@@ -50,6 +53,10 @@ function App() {
           <Route path="/driver/login/2FA" element={<Login2FA />} />
           <Route path="/driver/dashboard" element={<DriverDashboard />} />
           <Route path="/driver/complete-registration" element={<CompleteRegistration />} />
+
+          {/* ADMIN ROUTES */}
+          <Route path='/admin' element={<AdminDashboard />} />
+          <Route path='/admin/login' element={<AdminDashboard />} />
         </Routes>
       </CarpalarContext.Provider>
     </React.Fragment>

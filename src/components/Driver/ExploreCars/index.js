@@ -12,6 +12,7 @@ import suzuki from "../../../assets/images/delete-later/suzuki-alto.jpg";
 // import verifyIcon from "../../../assets/icons/verify.svg";
 // import ownIcon from "../../../assets/icons/own.svg";
 import Navbar from "../../Generic/Navbar";
+import OurPartners from "../OurPartners";
 
 function ExploreCars() {
   const { isInvestor } = useContext(CarpalarContext);
@@ -50,23 +51,7 @@ function ExploreCars() {
 
             {/* 9 */}
 
-            <div className="d-flex flex-column justify-content-center align-items-center m-5 p-5 opacity-50">
-              <h2>
-                Our partners<span className="blue-text">.</span>
-              </h2>
-              <div className="partner-logos mt-5 d-flex justify-content-center align-items-center">
-                <img
-                  src={verifyme}
-                  alt="Verify me"
-                  className="partner-logo mx-5"
-                />
-                <img
-                  src={youverify}
-                  alt="Verify me"
-                  className="partner-logo mx-5"
-                />
-              </div>
-            </div>
+            <OurPartners />
           </main>
 
           <Footer />

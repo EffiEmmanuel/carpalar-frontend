@@ -15,3 +15,17 @@
     flex-direction: column;
     justify-content: space-between;
   }
+
+  .step-1.complete-registration::after {
+    content: '01 - Guarantor info';
+  }
+  
+  .step-2.complete-registration::after {
+    content: '02 - Car and payment info';
+  }
+
+  @media (max-width: 998px) {
+    .apply-to-drive-left.complete-registration {
+      display: none;
+    }
+  }

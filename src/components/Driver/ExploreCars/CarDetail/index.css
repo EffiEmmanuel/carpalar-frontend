@@ -1,0 +1,18 @@
+.vehicle-brand-image {
+    max-width: 60%;
+    min-width: 20%;
+}
+
+.car-spec {
+    background-color: #f7f9fe;
+    padding: 20px;
+    width: 260px;
+    height: 130px;
+    margin: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 20px;
+}

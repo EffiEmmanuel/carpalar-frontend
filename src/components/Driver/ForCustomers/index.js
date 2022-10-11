@@ -5,8 +5,7 @@ import verifyme from "../../../assets/images/verifyme.png";
 import youverify from "../../../assets/icons/youverify.svg";
 import Footer from "../Footer";
 import { CarpalarContext } from "../../../App";
-import Navbar from "../../Generic/Navbar";
-import { Fade } from "react-awesome-reveal";
+// import Navbar from "../../Generic/Navbar";
 
 function ForCustomers() {
   const { isApplyToDrive, setIsApplyToDrive } = useContext(CarpalarContext);
