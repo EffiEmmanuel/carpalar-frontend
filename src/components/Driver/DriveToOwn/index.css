@@ -1,133 +1,165 @@
 .hero.drive-to-own {
-    height: 750px;
-    background: linear-gradient(45deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.55)),
-      url("../../../assets/images/drive-to-own.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    /* padding-top: 150px; */
-    padding: 100px 20px;
-  }
+  height: 450px;
+  background: linear-gradient(45deg, rgb(255, 255, 255), rgb(255, 255, 255)),
+    url("../../../assets/images/feature2.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  /* padding-top: 150px; */
+  padding: 100px 20px;
+  position: relative;
+  color: #000 !important;
+  overflow: hidden;
+}
+
+.hero.drive-to-own::after {
+  content: "Carpalar";
+  font-size: 25rem;
+  font-weight: 800;
+  font-family: "Poppins";
+  color: #3f69e2;
+  opacity: 0.03;
+  position: absolute;
+  top: -100px;
+  left: 0;
+  z-index: 0;
+}
+
+.hero-content.drive-to-own p {
+  max-width: 70%;
+  font-size: 1.1rem;
+  color: #000 !important;
+}
+
+.hero-content.drive-to-own h1 {
+  max-width: 70%;
+  color: #000 !important;
+  /* font-size: 1.2rem; */
+  font-weight: 600;
+}
 
 .vehicle-card {
-    width: 370px;
-    height: 470px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: rgb(0 0 0 / 7%) 0px 2px 30px;
-    position: relative;
-    top: 0px;
-    transition: top 0.3s ease 0s, box-shadow 0.3s ease 0s;
+  width: 370px;
+  height: 470px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: rgb(0 0 0 / 7%) 0px 2px 30px;
+  position: relative;
+  top: 0px;
+  transition: top 0.3s ease 0s, box-shadow 0.3s ease 0s;
 }
 
 .vehicle-card:hover {
-    box-shadow: rgb(0 0 0 / 10%) 0px 6px 80px;
-    top: -4px;
-    cursor: pointer;
+  box-shadow: rgb(0 0 0 / 10%) 0px 6px 80px;
+  top: -4px;
+  cursor: pointer;
 }
 
 .vehicle-details {
-    width: 100%;
-    height: 150px;
-    /* background-color: aqua; */
+  width: 100%;
+  height: 150px;
+  /* background-color: aqua; */
 }
 
-.transmission, .fuel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.transmission,
+.fuel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.transmission p:first-child, .fuel p:first-child {
-    opacity: .5;
+.transmission p:first-child,
+.fuel p:first-child {
+  opacity: 0.5;
 }
 
 .vehicle-imag-container {
-    width: 100%;
-    height: 200px;
+  width: 100%;
+  height: 200px;
 }
 
 .vehicle-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .vehicle-card-footer {
-    height: 50px;
-    width: 100%;
-    display: flex;
-    align-items: center;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .arrow {
-    position: relative;
-    right: 0px;
-    transition: right 0.3s ease-out;
+  position: relative;
+  right: 0px;
+  transition: right 0.3s ease-out;
 }
 
 .view-details-link:hover .arrow {
-    right: -6px;
+  right: -6px;
 }
 
 .link-to-vehicle-page {
-    text-decoration: none;
-    color: #000;
+  text-decoration: none;
+  color: #000;
 }
 
 .link-to-vehicle-page:hover {
-    color: #000 !important;
+  color: #000 !important;
 }
 
 .link-to-vehicle-page:visited {
-    color: #000 !important;
+  color: #000 !important;
 }
 
 .steps-to-own {
-    width: 100%;
+  width: 100%;
 }
 
-.steps-to-own p, .steps-to-own small, .steps-to-own h2 {
-    display: block;
-    text-align: center;
-    font-weight: 600;
+.steps-to-own p,
+.steps-to-own small,
+.steps-to-own h2 {
+  display: block;
+  text-align: center;
+  font-weight: 600;
 }
 
 .steps-to-own-top {
-    width: 100%;
+  width: 100%;
 }
 
 .step {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    margin-top: 60px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 60px;
 }
 
 .steps-to-own-bottom {
-    width: 100%;
+  width: 100%;
 }
 
 .steps-icon {
-    max-width: 120px;
-    min-width: 120px;
-    margin-bottom: 20px;
+  max-width: 120px;
+  min-width: 120px;
+  margin-bottom: 20px;
 }
 
 @media (max-width: 998px) {
-    .steps-to-own-bottom {
-        flex-direction: column;
-    }
+  .steps-to-own-bottom {
+    flex-direction: column;
+  }
 
-    .partner-logos {
-        flex-direction: column;
-    }
+  .partner-logos {
+    flex-direction: column;
+  }
 
-    .partner-logos img:last-child {
-        margin-top: 40px;
-    }
-
+  .partner-logos img:last-child {
+    margin-top: 40px;
+  }
 }

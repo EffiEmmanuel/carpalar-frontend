@@ -3,17 +3,21 @@ import { useFormik } from "formik";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import adminLoginSchema from "./validation";
 import driverLoginSchema from "./validation";
 
-function DriverLoginForm() {
+function AdminLoginForm() {
   const navigator = useNavigate();
 
   const onSubmit = async (values, actions) => {
     await axios
-      .post(`${process.env.REACT_APP_BASE_URL_DRIVER}/login`, values)
+      .post(`${process.env.REACT_APP_BASE_URL_ADMIN}/login`, values)
       .then((res) => {
         console.log("RES:", res);
-        navigator(`/driver/login/2FA?driverId=${res?.data?.driverId}`);
+        // Save admin token in local storage
+        console.log('Before setting admin token to localstorage')
+        localStorage.setItem('adminToken', res.data.adminToken)
+        navigator('/admin/dashboard')
       })
       .catch((err) => {
         Swal.fire({
@@ -31,7 +35,7 @@ function DriverLoginForm() {
         email: "",
         password: "",
       },
-      validationSchema: driverLoginSchema,
+      validationSchema: adminLoginSchema,
       validateOnChange: false,
       onSubmit,
     });
@@ -66,20 +70,13 @@ function DriverLoginForm() {
       <button className="btn btn-dark blue-bg border-none px-4 py-2 mt-4">
         Log in
       </button>
-      <small className="">
+      {/* <small className="">
         <a href="/driver/forgot-password" className="nav-link mt-3">
           Forgot password?
         </a>
-      </small>
-
-      <p className="mt-3">
-        Don't have an account?
-        <a href="/apply-to-drive" className="mx-2">
-          Sign up
-        </a>
-      </p>
+      </small> */}
     </form>
   );
 }
 
-export default DriverLoginForm;
+export default AdminLoginForm;

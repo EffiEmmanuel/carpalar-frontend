@@ -3,7 +3,7 @@ import * as yup from "yup";
 const required = "*Required";
 
 const CompleteRegistrationSchema = new yup.object().shape({
-  gurarantorOneName: yup.string().required(required),
+  guarantorOneLastName: yup.string().required(required),
   gurarantorOneRelationship: yup.string().required(required),
   gurarantorOnePhone: yup.string().required(required),
   gurarantorOneAddress: yup.string().required(required),
@@ -12,7 +12,7 @@ const CompleteRegistrationSchema = new yup.object().shape({
   gurarantorOneNin: yup.number('NIN cannot contain alphabets').required(required),
   gurarantorOneBvn: yup.number('BVN cannot contain alphabets').required(required),
 
-  gurarantorTwoName: yup.string().required(required),
+  guarantorTwoLastName: yup.string().required(required),
   gurarantorTwoRelationship: yup.string().required(required),
   gurarantorTwoPhone: yup.string().required(required),
   gurarantorTwoAddress: yup.string().required(required),

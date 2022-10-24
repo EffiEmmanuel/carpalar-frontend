@@ -27,6 +27,20 @@
   padding: 30px 10px;
   position: fixed;
   top: 0;
+  overflow-y: scroll;
+}
+
+.dashboard-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.dashboard-nav::-webkit-scrollbar-track {
+  background-color: #f7f9fe70;
+}
+
+.dashboard-nav::-webkit-scrollbar-thumb {
+  background-color: #1818181e;
+  border-radius: 5px;
 }
 
 .dashboard-nav nav {

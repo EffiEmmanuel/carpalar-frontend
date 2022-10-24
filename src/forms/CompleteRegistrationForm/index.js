@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import CompleteRegistrationSchema from "./validation";
 import { useEffect } from "react";
 import jwtDecode from "jwt-decode";
+import PaystackPop from '@paystack/inline-js'
 
 function CompleteRegistrationForm({
   isStepOne,
@@ -20,6 +21,13 @@ function CompleteRegistrationForm({
 
   const [vehicles, setVehicles] = useState();
   const [fetchVehiclesError, setFetchVehiclesError] = useState();
+
+  const [guarantorOneNameBvn, setGuarantorOneNameBvn] = useState();
+  const [guarantorTwoNameBvn, setGuarantorTwoNameBvn] = useState();
+  const [guarantorOneNameNin, setGuarantorOneNameNin] = useState();
+  const [guarantorTwoNameNin, setGuarantorTwoNameNin] = useState();
+
+  const [isTransactionSuccessful, setIsTransactionSuccessful] = useState(false);
 
   // Get user token: USED TO MAKE SECURE API CALL
   useEffect(() => {
@@ -43,6 +51,17 @@ function CompleteRegistrationForm({
   const decodedDriver = jwtDecode(token);
 
   const onSubmit = async (values) => {
+    if (
+      guarantorOneNameBvn !== guarantorOneNameNin ||
+      guarantorTwoNameBvn !== guarantorTwoNameNin
+    ) {
+      return Swal.fire({
+        title: "Attention",
+        text: "Please cross-check the NINs and BVNs provided! Inconsistent data has been detected!",
+        icon: "info",
+        timer: 3000,
+      });
+    }
     const guarantorOne = {
       name: values.guarantorOneName,
       relationship: values.guarantorOneRelationship,
@@ -82,7 +101,7 @@ function CompleteRegistrationForm({
         },
         {
           headers: {
-            "authToken": `Bearer ${token}`,
+            authToken: `Bearer ${token}`,
           },
         }
       )
@@ -101,13 +120,13 @@ function CompleteRegistrationForm({
         if (err.response.data.message === "Token required!") {
           Swal.fire({
             title: "Error",
-            text: 'Session timeout. Please log in again.',
+            text: "Session timeout. Please log in again.",
             icon: "error",
             timer: 3000,
           });
 
-          navigator('/driver/login')
-          return
+          navigator("/driver/login");
+          return;
         }
 
         Swal.fire({
@@ -124,14 +143,150 @@ function CompleteRegistrationForm({
       });
   };
 
-  const checkBvn = async (e, indicator) => {
-    console.log('BVN:', e.target.value)
-    console.log('INDICATOR:', indicator)
-    if(e.target.value.length === 11) {
-      e.target.disabled = 'true'
-      console.log('11 characters reached')
-    }
+  const paystackPay = async () => {
+    const paystack = new PaystackPop()
+    const amount = +values.downpaymentBudget * 100
+    console.log('Amount:', amount)
+    console.log('Amount type:', typeof amount)
+    console.log('PAYSTACK:', paystack)
+    paystack.newTransaction({
+      key: "pk_test_dd7ee9d92ddadad73da127a2f34831fd3e3d54d4",
+      amount: amount,
+      email: decodedDriver?.email,
+      firstname: decodedDriver?.firstname,
+      lastname: decodedDriver?.surname,
+      onSuccess: async (transaction) => {
+        console.log('REF ID:', transaction.reference)
+        // VERIFY TRANSACTION HERE
+        await axios.get(`${process.env.REACT_APP_BASE_URL_ADMIN}/transactions/verify/${transaction.reference}`)
+        .then(res => {
+          console.log('RESPONSE FROM VERIFY:', res)
+          return axios.post(`${process.env.REACT_APP_BASE_URL_ADMIN}/transactions`, {
+            transactionId: res.data.transactionDetails.id,
+            amount: res.data.transactionDetails.amount,
+            channel: res.data.transactionDetails.channel,
+            currency: res.data.transactionDetails.currency,
+            ipAddress: res.data.transactionDetails.ipAddress,
+            reference: res.data.transactionDetails.reference,
+            driver: decodedDriver?._id,
+            status: res.data.transactionDetails.status,
+          })
+        }).then(res => {
+          Swal.fire({
+            title: 'Success',
+            text: 'Payment made successfully! Please click on the apply button to complete your registration.',
+            icon: 'success',
+            timer: 3000
+          })
+          setIsTransactionSuccessful(true)
+        })
+        .catch(err => {
+          console.log('ERROR FROM VERIFY:', err)
+        })
+      }
+    })
+
   }
+
+  const checkNin = async (e, lastname, isGuarantorOne) => {
+    console.log("INSIDE CHECK NIN");
+    if (lastname === "") {
+      return Swal.fire({
+        title: "Attention",
+        text: "Lastname must be filled first!",
+        icon: "info",
+        timer: 3000,
+      });
+    }
+    if (e.target.value.length === 11) {
+      e.target.disabled = true;
+      await axios
+        .post(
+          `https://vapi.verifyme.ng/v1/verifications/identities/nin/${e.target.value}?type=basic`,
+          {
+            lastname: lastname,
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0NzM3MSwiZW52IjoidGVzdCIsImlhdCI6MTY2NjMzOTU4MH0.SxPzE7aZFejgVvknmHsrkJSvBF_Y4mDbOJ6yqUmIryw",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("VERIFYME RESPONSE:", res);
+          if (res.data.data.fieldMatches.lastname) {
+            e.target.disabled = false;
+            isGuarantorOne
+              ? setGuarantorOneNameNin(
+                  `${res.data.data.firstname} ${res.data.data.lastname}`
+                )
+              : setGuarantorTwoNameNin(
+                  `${res.data.data.firstname} ${res.data.data.lastname}`
+                );
+          } else {
+            e.target.disabled = false;
+            isGuarantorOne
+              ? setGuarantorOneNameNin(`Lastname did not match provided BVN!`)
+              : setGuarantorTwoNameNin(`Last name did not match provided BVN!`);
+          }
+        })
+        .catch((err) => {
+          console.log("VERIFYME ERROR:", err);
+        });
+    }
+  };
+  const checkBvn = async (e, lastname, isGuarantorOne) => {
+    console.log("INSIDE CHECK BVN");
+    if (lastname === "") {
+      return Swal.fire({
+        title: "Attention",
+        text: "Lastname must be filled first!",
+        icon: "info",
+        timer: 3000,
+      });
+    }
+    if (e.target.value.length === 11) {
+      e.target.disabled = true;
+      await axios
+        .post(
+          `https://vapi.verifyme.ng/v1/verifications/identities/bvn/${e.target.value}?type=basic`,
+          {
+            firstname: "John",
+            lastname: lastname,
+            phone: "080000000000",
+            dob: "04-04-1944",
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0NzM3MSwiZW52IjoidGVzdCIsImlhdCI6MTY2NjMzOTU4MH0.SxPzE7aZFejgVvknmHsrkJSvBF_Y4mDbOJ6yqUmIryw",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("VERIFYME RESPONSE:", res);
+          if (res.data.data.fieldMatches.lastname) {
+            e.target.disabled = false;
+            isGuarantorOne
+              ? setGuarantorOneNameBvn(
+                  `${res.data.data.firstname} ${res.data.data.lastname}`
+                )
+              : setGuarantorTwoNameBvn(
+                  `${res.data.data.firstname} ${res.data.data.lastname}`
+                );
+          } else {
+            e.target.disabled = false;
+            isGuarantorOne
+              ? setGuarantorOneNameBvn(`Lastname did not match provided BVN!`)
+              : setGuarantorTwoNameBvn(`Last name did not match provided BVN!`);
+          }
+        })
+        .catch((err) => {
+          console.log("VERIFYME ERROR:", err);
+        });
+    }
+  };
 
   const {
     values,
@@ -142,7 +297,7 @@ function CompleteRegistrationForm({
     isSubmitting,
   } = useFormik({
     initialValues: {
-      guarantorOneName: "",
+      guarantorOneLastName: "",
       guarantorOneRelationship: "",
       guarantorOnePhone: "",
       guarantorOneAddress: "",
@@ -151,7 +306,7 @@ function CompleteRegistrationForm({
       guarantorOneNin: "",
       guarantorOneBvn: "",
 
-      guarantorTwoName: "",
+      guarantorTwoLastName: "",
       guarantorTwoRelationship: "",
       guarantorTwoPhone: "",
       guarantorTwoAddress: "",
@@ -191,22 +346,71 @@ function CompleteRegistrationForm({
         <h5>Guatantor 1</h5>
 
         <div className="form-group mt-3">
-          <label htmlFor="guarantorOneName">name</label>
+          <label htmlFor="guarantorOneLastName">Lastname</label>
           <input
             type="text"
-            id="guarantorOneName"
+            id="guarantorOneLastName"
             className="form-control"
-            name="guarantorOneName"
-            value={values.guarantorOneName}
+            name="guarantorOneLastName"
+            value={values.guarantorOneLastName}
             placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
-            disabled={true}
+            // disabled={true}
           />
-          {errors.guarantorOneName && (
-            <p className="error">{errors.guarantorOneName}</p>
+          {errors.guarantorOneLastName && (
+            <p className="error">{errors.guarantorOneLastName}</p>
           )}
         </div>
+
+        <div className="form-group">
+          <label htmlFor="guarantorOneBvn">bvn</label>
+          <input
+            type="text"
+            id="guarantorOneBvn"
+            className="form-control"
+            name="guarantorOneBvn"
+            value={values.guarantorOneBvn}
+            maxLength={11}
+            placeholder="********"
+            onChange={(e) => {
+              checkBvn(e, values.guarantorOneLastName, true);
+              handleChange(e);
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorOneBvn && (
+            <p className="error">{errors.guarantorOneBvn}</p>
+          )}
+          {guarantorOneNameBvn && <label>{guarantorOneNameBvn}</label>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="guarantorOneNin">nin</label>
+          <input
+            type="text"
+            id="guarantorOneNin"
+            className="form-control"
+            name="guarantorOneNin"
+            value={values.guarantorOneNin}
+            placeholder="********"
+            maxLength={11}
+            minLength={11}
+            onChange={(e) => {
+              checkNin(e, values.guarantorOneLastName, true);
+              // checkBvn(e);
+              handleChange(e);
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorOneNin && (
+            <p className="error">{errors.guarantorOneNin}</p>
+          )}
+          {guarantorOneNameNin && <label>{guarantorOneNameNin}</label>}
+        </div>
+
         <div className="form-group">
           <label htmlFor="guarantorOneRelationship">relationship</label>
           <input
@@ -292,64 +496,74 @@ function CompleteRegistrationForm({
             <p className="error">{errors.guarantorOneEmail}</p>
           )}
         </div>
-        <div className="form-group">
-          <label htmlFor="guarantorOneNin">nin</label>
-          <input
-            type="text"
-            id="guarantorOneNin"
-            className="form-control"
-            name="guarantorOneNin"
-            value={values.guarantorOneNin}
-            placeholder="********"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorOneNin && (
-            <p className="error">{errors.guarantorOneNin}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorOneBvn">bvn</label>
-          <input
-            type="text"
-            id="guarantorOneBvn"
-            className="form-control"
-            name="guarantorOneBvn"
-            value={values.guarantorOneBvn}
-            maxLength={11}
-            placeholder="********"
-            onChange={(e) => {
-              handleChange(e)
-              checkBvn(e, 'G1')
-            }}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorOneBvn && (
-            <p className="error">{errors.guarantorOneBvn}</p>
-          )}
-        </div>
 
         <hr className="hr-opacity mt-5" />
         <h5>Guatantor 2</h5>
 
         <div className="form-group mt-3">
-          <label htmlFor="guarantorTwoName">name</label>
+          <label htmlFor="guarantorTwoLastName">Lastname</label>
           <input
             type="text"
-            id="guarantorTwoName"
+            id="guarantorTwoLastName"
             className="form-control"
-            name="guarantorTwoName"
-            value={values.guarantorTwoName}
+            name="guarantorTwoLastName"
+            value={values.guarantorTwoLastName}
             placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorTwoName && (
-            <p className="error">{errors.guarantorTwoName}</p>
+          {errors.guarantorTwoLastName && (
+            <p className="error">{errors.guarantorTwoLastName}</p>
           )}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="guarantorTwoBvn">bvn</label>
+          <input
+            type="text"
+            id="guarantorTwoBvn"
+            className="form-control"
+            name="guarantorTwoBvn"
+            value={values.guarantorTwoBvn}
+            placeholder="********"
+            maxLength={11}
+            minLength={11}
+            onChange={(e) => {
+              checkBvn(e, values.guarantorTwoLastName, false);
+              handleChange(e);
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoBvn && (
+            <p className="error">{errors.guarantorTwoBvn}</p>
+          )}
+          {guarantorTwoNameBvn && <label>{guarantorTwoNameBvn}</label>}
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="guarantorTwoNin">nin</label>
+          <input
+            type="text"
+            id="guarantorTwoNin"
+            className="form-control"
+            name="guarantorTwoNin"
+            value={values.guarantorTwoNin}
+            placeholder="********"
+            maxLength={11}
+            minLength={11}
+            onChange={(e) => {
+              checkNin(e, values.guarantorTwoLastName, false);
+              handleChange(e);
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.guarantorTwoNin && (
+            <p className="error">{errors.guarantorTwoNin}</p>
+          )}
+          {guarantorTwoNameNin && <label>{guarantorTwoNameNin}</label>}
         </div>
         <div className="form-group">
           <label htmlFor="guarantorTwoRelationship">relationship</label>
@@ -436,40 +650,6 @@ function CompleteRegistrationForm({
             <p className="error">{errors.guarantorTwoEmail}</p>
           )}
         </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoNin">nin</label>
-          <input
-            type="text"
-            id="guarantorTwoNin"
-            className="form-control"
-            name="guarantorTwoNin"
-            value={values.guarantorTwoNin}
-            placeholder="********"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoNin && (
-            <p className="error">{errors.guarantorTwoNin}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoBvn">bvn</label>
-          <input
-            type="text"
-            id="guarantorTwoBvn"
-            className="form-control"
-            name="guarantorTwoBvn"
-            value={values.guarantorTwoBvn}
-            placeholder="********"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoBvn && (
-            <p className="error">{errors.guarantorTwoBvn}</p>
-          )}
-        </div>
       </div>
 
       <div
@@ -506,7 +686,7 @@ function CompleteRegistrationForm({
               </option>
               {vehicles?.map((vehicle) => (
                 <option key={vehicle?._id} value={`${vehicle?._id}`}>
-                  {vehicle?.name}
+                  {vehicle?.name} - ₦{new Intl.NumberFormat('en-US').format(vehicle?.price)}
                 </option>
               ))}
             </optgroup>
@@ -568,9 +748,9 @@ function CompleteRegistrationForm({
                 Select
               </option>
               <option value="400000">₦400,000</option>
-              <option value="500,000">₦500,000</option>
-              <option value="700,000">₦700,000</option>
-              <option value="1,000,000">₦1,000,000</option>
+              <option value="500000">₦500,000</option>
+              <option value="700000">₦700,000</option>
+              <option value="1000000">₦1,000,000</option>
               <option value="other">Other</option>
             </optgroup>
           </select>
@@ -643,20 +823,32 @@ function CompleteRegistrationForm({
           )}
           {isStepTwo && (
             <div className="next-button-apply">
-              <button
-                type="submit"
-                className="btn btn-dark blue-bg py-2 px-4 next-button"
-                disabled={isSubmitting}
-                onClick={() => onSubmit(values)}
-              >
-                {isSubmitting && (
-                  <span>
-                    <i className="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
-                    <span className="sr-only">Applying...</span>
-                  </span>
-                )}
-                {!isSubmitting && <span>Apply</span>}
-              </button>
+              {isTransactionSuccessful && (
+                <button
+                  type="submit"
+                  className="btn btn-dark blue-bg py-2 px-4 next-button"
+                  disabled={isSubmitting}
+                  onClick={() => onSubmit(values)}
+                >
+                  {isSubmitting && (
+                    <span>
+                      <i className="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
+                      <span className="sr-only">Applying...</span>
+                    </span>
+                  )}
+                  {!isSubmitting && <span>Apply</span>}
+                </button>
+              )}
+              {!isTransactionSuccessful && (
+                <button
+                  type="submit"
+                  className="btn btn-dark blue-bg py-2 px-4 next-button"
+                  disabled={isSubmitting}
+                  onClick={() => paystackPay()}
+                >
+                  <span>Make Payment</span>
+                </button>
+              )}
             </div>
           )}
         </div>

@@ -37,19 +37,15 @@ function DriverDashboard() {
 
   // DRIVER STATES
   const [decodedDriver, setDecodedDriver] = useState();
+  const [decodedDriverCheck, setDecodedDriverCheck] = useState();
   const [driverInitials, setDriverInitials] = useState("");
 
   useEffect(() => {
     const onPageLoad = () => {
       let token = localStorage.getItem("driverToken");
-      const d = jwtDecode(token);
-      if (d?.isAccountApproved && d?.isApplicationComplete) {
-        setDecodedDriver(jwtDecode(token));
-        if (decodedDriver) {
-          const initials = `${decodedDriver?.firstname[0]}${decodedDriver?.othername[0]}`;
-          setDriverInitials(initials);
-        }
-      }
+      setDecodedDriver(jwtDecode(token));
+      const initials = `${decodedDriver?.firstname[0]}${decodedDriver?.othername[0]}`;
+      setDriverInitials(initials);
     };
 
     // Check if the page has already loaded
@@ -70,7 +66,7 @@ function DriverDashboard() {
           <h4 className="mt-2">Your account has not been approved.</h4>
         </div>
       )}
-      {!decodedDriver?.isAccountApproved &&
+      {decodedDriver?.isAccountApproved &&
         !decodedDriver?.isApplicationComplete && (
           <div className="glass-box d-flex flex-column justify-content-center align-items-center">
             <Lock size={30} />
@@ -87,6 +83,7 @@ function DriverDashboard() {
             </a>
           </div>
         )}
+
       <div className="dashboard-container">
         <div
           className="dashboard-nav"
@@ -228,7 +225,6 @@ function DriverDashboard() {
                     <li>
                       <button
                         className="btn btn-dark blue-bg border-none text-white"
-
                         onClick={() => {
                           setIsPersonalDetails(false);
                           setIsProfessionalDetails(false);

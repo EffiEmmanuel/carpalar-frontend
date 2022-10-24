@@ -465,25 +465,25 @@ function ApplyToDriveForm({
           </label>
           <select
             name="highestAcademicQualification"
-            value="male"
             className="form-control"
+            value={values.highestAcademicQualification}
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           >
-            <option value="" disabled>
+            <option value="">
               Select
             </option>
-            <option value="phd" disabled>
+            <option value="phd">
               PhD
             </option>
-            <option value="msc" disabled>
+            <option value="msc">
               Masters's Degree
             </option>
-            <option value="bsc" disabled>
+            <option value="bsc">
               Bachelor's Degree
             </option>
-            <option value="ssce" disabled>
+            <option value="ssce">
               SSCE / O Level
             </option>
           </select>
@@ -672,7 +672,7 @@ function ApplyToDriveForm({
               >
                 {isSubmitting && (
                   <span>
-                    <i className="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
+                    <i className="fa fa-spinner fa-pulse fa-2x fa-fw margin-bottom"></i>
                     <span className="sr-only">Applying...</span>
                   </span>
                 )}

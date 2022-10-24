@@ -1,0 +1,145 @@
+.search-drivers {
+    height: 40px;
+    /* font-size: 14px; */
+}
+
+.driver-card {
+    width: 200%;
+}
+
+.driver-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 200%;
+}
+
+.driver-details-header span {
+    font-weight: 700;
+    color: #aeaeae;
+    text-transform: uppercase;
+    font-size: .7rem;
+}
+
+.driver-detail {
+    width: 15%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    word-wrap: break-word;
+}
+
+.driver-detail hr {
+    transform: rotate(90deg);
+    width: 30px;
+}
+
+.drivers-pending-applications {
+    max-width: 100%;
+    overflow-x: scroll;
+}
+
+
+/* DOCTOR CARD STYLE RULES */
+
+.appointment-card {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+}
+
+.appointment {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.appointment-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 200%;
+    align-items: center;
+}
+
+.appointment-details > p {
+    margin-bottom: 0;
+}
+
+.driver-card-hr {
+    transform: rotate(90deg);
+    width: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.action-buttons button {
+    border: none;
+    height: 25px;
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    margin-left: 20px;
+    border-radius: 50%;
+}
+
+.action-buttons button svg {
+    margin: 0;
+    /* width: 10px; */
+}
+
+.action-buttons button:nth-child(1) {
+    background-color: #ED5E5E;
+}
+
+.action-buttons button:nth-child(2) {
+    background-color: #53AB34;
+}
+
+.action-buttons .delete, .action-buttons .done {
+    width: 35px;
+    height: 35px;
+}
+
+.appointments-list {
+    margin-top: 30px;
+}
+
+
+@media (max-width: 768px) {
+    .appointment {
+        height: 250px;
+        position: relative;
+    }
+
+    .appointment-details {
+        flex-direction: column;
+    }
+
+    .appointment-details hr {
+        transform: rotate(0deg) !important;
+    }
+
+    .appointment-card {
+        width: 60%;
+    }
+
+    .action-buttons {
+        /* flex-direction: column; */
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+    .action-buttons .delete, .action-buttons .done {
+        margin: 20px 5px;
+    }
+} 

@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { XLg } from "react-bootstrap-icons";
 import DriverLoginForm from "../../../forms/DriverLoginForm";
+import AdminLoginForm from "../../../forms/AdminLoginForm";
 // import
 
 function AdminLogin() {
@@ -15,7 +16,7 @@ function AdminLogin() {
 
   return (
     <div className="apply-to-drive-container">
-      <div className="apply-to-drive-left login-left">
+      <div className="apply-to-drive-left login-left admin-login">
         {/* LOGO HERE */}
         <div className="logo-container">
           <img src={carpalarLogo} alt="Carpalar" className="nav-logo" />
@@ -53,7 +54,7 @@ function AdminLogin() {
                 showConfirmButton: true,
                 showDenyButton: true,
                 confirmButtonText: `No, stay`,
-                denyButtonText: `Yes, go back to homepge`,
+                denyButtonText: `Yes, go back to homepage`,
                 allowOutsideClick: false,
                 closeOnClickOutside: false
               }).then((result) => {
@@ -71,10 +72,10 @@ function AdminLogin() {
 
         <div className="login-form-container">
           <h2>
-            Driver Log in<span className="blue-text">.</span>
+            Admin Log in<span className="blue-text">.</span>
           </h2>
           <p>Sign in to your account</p>
-          <DriverLoginForm />
+          <AdminLoginForm />
         </div>
       </div>
     </div>

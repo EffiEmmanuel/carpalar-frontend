@@ -16,6 +16,9 @@ import DriverDashboard from "./components/Driver/DriverDashboard";
 import CompleteRegistration from "./components/Driver/CompleteRegistration";
 import CarDetail from "./components/Driver/ExploreCars/CarDetail";
 import AdminDashboard from "./components/Admin/AdminDashboard";
+import AdminLogin from "./components/Admin/AdminLogin";
+import DriverProtectedRoute from "./components/Driver/DriverProtectedRoute";
+import AdminProtectedRoute from "./components/Admin/AdminProtectedRoute";
 
 export const CarpalarContext = createContext(null);
 
@@ -45,18 +48,39 @@ function App() {
           <Route path="/explore-cars/:carId" element={<CarDetail />} />
           <Route path="/drive-to-own" element={<DriveToOwn />} />
           <Route path="/apply-to-drive" element={<ApplyToDrive />} />
-          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+          <Route
+            path="/terms-and-conditions"
+            element={<TermsAndConditions />}
+          />
           <Route path="/faqs" element={<Faq />} />
-          <Route path="/driver/:driverId/verify-phone" element={<PhoneVerification />} />
-          <Route path="/driver/verify-email" element={<EmailVerificationPage />} />
+          <Route
+            path="/driver/:driverId/verify-phone"
+            element={<PhoneVerification />}
+          />
+          <Route
+            path="/driver/verify-email"
+            element={<EmailVerificationPage />}
+          />
           <Route path="/driver/login" element={<Login />} />
           <Route path="/driver/login/2FA" element={<Login2FA />} />
-          <Route path="/driver/dashboard" element={<DriverDashboard />} />
-          <Route path="/driver/complete-registration" element={<CompleteRegistration />} />
+
+          <Route element={<DriverProtectedRoute />}>
+            <Route path="/driver/dashboard" element={<DriverDashboard />} />
+          </Route>
+          <Route element={<DriverProtectedRoute />}>
+            <Route
+              path="/driver/complete-registration"
+              element={<CompleteRegistration />}
+            />
+          </Route>
 
           {/* ADMIN ROUTES */}
-          <Route path='/admin' element={<AdminDashboard />} />
-          <Route path='/admin/login' element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+
+          <Route element={<AdminProtectedRoute />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          </Route>
         </Routes>
       </CarpalarContext.Provider>
     </React.Fragment>
