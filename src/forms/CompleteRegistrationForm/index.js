@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import CompleteRegistrationSchema from "./validation";
 import { useEffect } from "react";
 import jwtDecode from "jwt-decode";
-import PaystackPop from '@paystack/inline-js'
+import PaystackPop from "@paystack/inline-js";
 
 function CompleteRegistrationForm({
   isStepOne,
@@ -26,6 +26,7 @@ function CompleteRegistrationForm({
   const [guarantorTwoNameBvn, setGuarantorTwoNameBvn] = useState();
   const [guarantorOneNameNin, setGuarantorOneNameNin] = useState();
   const [guarantorTwoNameNin, setGuarantorTwoNameNin] = useState();
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const [isTransactionSuccessful, setIsTransactionSuccessful] = useState(false);
 
@@ -63,7 +64,7 @@ function CompleteRegistrationForm({
       });
     }
     const guarantorOne = {
-      name: values.guarantorOneName,
+      name: guarantorOneNameBvn,
       relationship: values.guarantorOneRelationship,
       phone: values.guarantorOnePhone,
       address: values.guarantorOneAddress,
@@ -74,7 +75,7 @@ function CompleteRegistrationForm({
     };
 
     const guarantorTwo = {
-      name: values.guarantorTwoName,
+      name: guarantorTwoNameBvn,
       relationship: values.guarantorTwoRelationship,
       phone: values.guarantorTwoPhone,
       address: values.guarantorTwoAddress,
@@ -83,10 +84,6 @@ function CompleteRegistrationForm({
       nin: values.guarantorTwoNin,
       bvn: values.guarantorTwoBvn,
     };
-
-    console.log("VALUES:", values);
-    console.log("GONE:", guarantorOne);
-    console.log("GTWO:", guarantorTwo);
 
     await axios
       .patch(
@@ -108,13 +105,12 @@ function CompleteRegistrationForm({
       .then((res) => {
         Swal.fire({
           title: "Congratulations!🎉",
-          text: "Your application has been completed successfully.",
+          text: "Your application has been completed successfully. Please log in to access your dashboard",
           icon: "success",
           timer: 4000,
         });
-        console.log("RES:", res);
-
-        // navigator('/driver/dashboard');
+        localStorage.removeItem("driverToken");
+        navigator("/driver/login");
       })
       .catch((err) => {
         if (err.response.data.message === "Token required!") {
@@ -135,58 +131,70 @@ function CompleteRegistrationForm({
           icon: "error",
           timer: 3000,
         });
-
-        console.log("Error:", err);
-        console.log("Error response:", err.response);
-        console.log("Error data:", err.response.data.message);
         return true;
       });
   };
 
   const paystackPay = async () => {
-    const paystack = new PaystackPop()
-    const amount = +values.downpaymentBudget * 100
-    console.log('Amount:', amount)
-    console.log('Amount type:', typeof amount)
-    console.log('PAYSTACK:', paystack)
+    const paystack = new PaystackPop();
+    const amount = +values.downpaymentBudget * 100;
+    console.log("Amount:", amount);
+    console.log("Amount type:", typeof amount);
+    console.log("PAYSTACK:", paystack);
     paystack.newTransaction({
-      key: "pk_test_dd7ee9d92ddadad73da127a2f34831fd3e3d54d4",
+      key: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
       amount: amount,
       email: decodedDriver?.email,
       firstname: decodedDriver?.firstname,
       lastname: decodedDriver?.surname,
       onSuccess: async (transaction) => {
-        console.log('REF ID:', transaction.reference)
+        console.log("REF ID:", transaction.reference);
+        setIsVerifying(true);
         // VERIFY TRANSACTION HERE
-        await axios.get(`${process.env.REACT_APP_BASE_URL_ADMIN}/transactions/verify/${transaction.reference}`)
-        .then(res => {
-          console.log('RESPONSE FROM VERIFY:', res)
-          return axios.post(`${process.env.REACT_APP_BASE_URL_ADMIN}/transactions`, {
-            transactionId: res.data.transactionDetails.id,
-            amount: res.data.transactionDetails.amount,
-            channel: res.data.transactionDetails.channel,
-            currency: res.data.transactionDetails.currency,
-            ipAddress: res.data.transactionDetails.ipAddress,
-            reference: res.data.transactionDetails.reference,
-            driver: decodedDriver?._id,
-            status: res.data.transactionDetails.status,
+        await axios
+          .get(
+            `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions/verify/${transaction.reference}`
+          )
+          .then((res) => {
+            // SAVE VERIFIED TRANSACTION TO THE DATABASE
+            console.log("RESPONSE FROM VERIFY:", res);
+            return axios.post(
+              `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions`,
+              {
+                transactionId: res.data.transactionDetails.id,
+                amount: res.data.transactionDetails.amount,
+                channel: res.data.transactionDetails.channel,
+                currency: res.data.transactionDetails.currency,
+                reference: res.data.transactionDetails.reference,
+                driver: decodedDriver?._id,
+                status: res.data.transactionDetails.status,
+              }
+            );
           })
-        }).then(res => {
-          Swal.fire({
-            title: 'Success',
-            text: 'Payment made successfully! Please click on the apply button to complete your registration.',
-            icon: 'success',
-            timer: 3000
+          .then((res) => {
+            Swal.fire({
+              title: "Success",
+              text: "Payment verified successfully! Please click on the apply button to complete your registration.",
+              icon: "success",
+              timer: 3000,
+            });
+            setIsVerifying(false);
+            setIsTransactionSuccessful(true);
           })
-          setIsTransactionSuccessful(true)
-        })
-        .catch(err => {
-          console.log('ERROR FROM VERIFY:', err)
-        })
-      }
-    })
-
-  }
+          .catch((err) => {
+            console.log("ERROR FROM VERIFY:", err);
+            Swal.fire({
+              title: "Error",
+              text: err.response.message,
+              icon: "error",
+              timer: 3000,
+            });
+            setIsVerifying(false);
+            setIsTransactionSuccessful(false);
+          });
+      },
+    });
+  };
 
   const checkNin = async (e, lastname, isGuarantorOne) => {
     console.log("INSIDE CHECK NIN");
@@ -686,7 +694,8 @@ function CompleteRegistrationForm({
               </option>
               {vehicles?.map((vehicle) => (
                 <option key={vehicle?._id} value={`${vehicle?._id}`}>
-                  {vehicle?.name} - ₦{new Intl.NumberFormat('en-US').format(vehicle?.price)}
+                  {vehicle?.name} - ₦
+                  {new Intl.NumberFormat("en-US").format(vehicle?.price)}
                 </option>
               ))}
             </optgroup>
@@ -843,10 +852,11 @@ function CompleteRegistrationForm({
                 <button
                   type="submit"
                   className="btn btn-dark blue-bg py-2 px-4 next-button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isVerifying}
                   onClick={() => paystackPay()}
                 >
-                  <span>Make Payment</span>
+                  {!isVerifying && <span>Make Payment</span>}
+                  {isVerifying && <span>Verifying Payment...</span>}
                 </button>
               )}
             </div>
