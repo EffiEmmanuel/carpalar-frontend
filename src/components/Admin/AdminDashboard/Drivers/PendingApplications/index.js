@@ -114,6 +114,9 @@ function PendingApplications() {
           <div className="driver-detail">
             <span>Phone verified</span>
           </div>
+          <div className="driver-detail">
+            <span>Registration fee</span>
+          </div>
         </div>
 
         {pendingApplications?.length === 0 && <p className="text-center w-100 my-5">No pending applications</p>}
@@ -137,6 +140,7 @@ function PendingApplications() {
               isDriversLicenseApproved='Yes'
               isEmailVerified={pendingApplication.isEmailVerified ? 'Yes' : 'No'}
               isPhoneVerified={pendingApplication.isPhoneVerified ? 'Yes' : 'No'}
+              isRegistrationFeePaid={pendingApplication.isRegistrationFeePaid ? 'Yes' : 'No'}
             />
           </div>
         ))}

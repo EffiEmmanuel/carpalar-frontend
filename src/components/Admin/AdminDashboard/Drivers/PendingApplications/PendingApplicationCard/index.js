@@ -20,6 +20,7 @@ function PendingApplicationCard({
   isDriversLicenseApproved,
   isEmailVerified,
   isPhoneVerified,
+  isRegistrationFeePaid,
   isViewDriver,
   isAccountBlocked
 }) {
@@ -72,6 +73,7 @@ function PendingApplicationCard({
           icon: "success",
           timer: 3000,
         });
+        window.location.reload()
       })
       .catch((err) => {
         console.log("ERR:", err);
@@ -103,6 +105,7 @@ function PendingApplicationCard({
           icon: "success",
           timer: 3000,
         });
+        window.location.reload()
       })
       .catch((err) => {
         console.log("ERR:", err);
@@ -204,6 +207,9 @@ function PendingApplicationCard({
         </div>
         <div className="driver-detail">
           <span>{isPhoneVerified}</span>
+        </div>
+        <div className="driver-detail">
+          <span>{isRegistrationFeePaid}</span>
         </div>
       </div>
       <div className="action-buttons">

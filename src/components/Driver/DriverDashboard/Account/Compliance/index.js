@@ -69,22 +69,50 @@ function Compliance({ driver }) {
 
           <div className="first-verification verification-type d-flex w-100 justify-content-between">
             <div className="verification-type-left d-flex justify-content-between">
-              {driverDetails.isApplicationComplete ? (
+              {driverDetails.isRegistrationFeePaid ? (
                 <CheckCircleFill color="mediumseagreen" size={20} />
               ) : (
                 <XCircleFill color="#ED4337" size={20} />
               )}
 
               <div className="verification-detail ms-2">
-                <h6>Application Completion</h6>
+                <h6>Registration fee payment</h6>
                 <small>Your application to Carpalar</small>
               </div>
             </div>
             <div className="verification-type-right">
-              {driverDetails.isApplicationComplete ? (
+              {driverDetails.isRegistrationFeePaid ? (
                 <span className="success">Completed</span>
               ) : (
                 <span className="error">Not completed</span>
+              )}
+            </div>
+          </div>
+
+          <hr className="hr-opacity" />
+
+          <div className="first-verification verification-type d-flex w-100 justify-content-between">
+            <div className="verification-type-left d-flex justify-content-between">
+              {driverDetails.guarantorsLength === 2 ? (
+                <CheckCircleFill color="mediumseagreen" size={20} />
+              ) : (
+                <XCircleFill color="#ED4337" size={20} />
+              )}
+
+              <div className="verification-detail ms-2">
+                <h6>Guarantors</h6>
+                <small>People that can vouch for you</small> <br />
+              </div>
+            </div>
+            <div className="verification-type-right">
+              {driverDetails.guarantorsLength === 2 ? (
+                <span className="success">Completed</span>
+              ) : (
+                <>
+                  <span className="error text-right">Not completed</span>
+                  <span className='error'> ({driverDetails.guarantorsLength} / 2 done)</span> <br />
+                  {/* <span className='text-right'><a href="/driver/dashboard">Select guarantors</a></span> */}
+                </>
               )}
             </div>
           </div>

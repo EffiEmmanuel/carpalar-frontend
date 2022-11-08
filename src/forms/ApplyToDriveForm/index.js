@@ -109,7 +109,7 @@ function ApplyToDriveForm({
         )
         .then((res) => {
           console.log("VERIFYME RESPONSE:", res);
-          if (res.data.data.fieldMatches.lastname) {
+          if (res.data?.data?.fieldMatches?.lastname) {
             e.target.disabled = true;
             setLicenseName('valid and matches details')
           } else {
@@ -309,7 +309,7 @@ function ApplyToDriveForm({
           {errors.email && <p className="error">{errors.email}</p>}
         </div>
         <div className="form-group">
-          <label htmlFor="password">Chooe a password</label>
+          <label htmlFor="password">Choose a password</label>
           <input
             type="password"
             id="password"

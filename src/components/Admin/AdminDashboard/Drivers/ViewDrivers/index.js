@@ -114,6 +114,9 @@ function ViewDrivers() {
           <div className="driver-detail">
             <span>Phone verified</span>
           </div>
+          <div className="driver-detail">
+            <span>Registration fee</span>
+          </div>
         </div>
 
         {drivers?.length === 0 && <p className="text-center w-100 my-5">No drivers yet</p>}
@@ -137,6 +140,7 @@ function ViewDrivers() {
               isDriversLicenseApproved='Yes'
               isEmailVerified={drivers.isEmailVerified ? 'Yes' : 'No'}
               isPhoneVerified={drivers.isPhoneVerified ? 'Yes' : 'No'}
+              isRegistrationFeePaid={drivers.isRegistrationFeePaid ? 'Yes' : 'No'}
               isViewDriver={true}
             />
           </div>

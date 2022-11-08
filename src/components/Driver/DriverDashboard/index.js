@@ -10,6 +10,7 @@ import {
   Lock,
   PatchCheck,
   Person,
+  ShieldCheck,
   Wallet2,
   XLg,
 } from "react-bootstrap-icons";
@@ -25,10 +26,12 @@ import MyPayments from "./Business/MyPayments";
 import PaystackPop from "@paystack/inline-js";
 import axios from "axios";
 import Swal from "sweetalert2";
+import Guarantors from "./Account/Guarantors";
 
 function DriverDashboard() {
   const [isPersonalDetails, setIsPersonalDetails] = useState(true);
   const [isProfessionalDetails, setIsProfessionalDetails] = useState(false);
+  const [isGuarantors, setIsGuarantors] = useState(false);
   const [isCompliance, setIsCompliance] = useState(false);
   const [isMyVehicle, setIsMyVehicle] = useState(false);
   const [isMyPayments, setIsMyPayments] = useState(false);
@@ -111,15 +114,19 @@ function DriverDashboard() {
             });
             setIsVerifying(false);
             setIsTransactionSuccessful(true);
-            return axios.patch(`${process.env.REACT_APP_BASE_URL_DRIVER}/update?driverId=${decodedDriver._id}`, { isApplicationComplete: true }, { 
-              headers: {
-                token: `${localStorage.getItem('driverToken')}`
+            return axios.patch(
+              `${process.env.REACT_APP_BASE_URL_DRIVER}/update?driverId=${decodedDriver._id}`,
+              { isRegistrationFeePaid: true },
+              {
+                headers: {
+                  token: `${localStorage.getItem("driverToken")}`,
+                },
               }
-             })
+            );
           })
-          .then(res => {
-            console.log('HELLO FROM THE OTHER SIIIIIDEEEEEEEE');
-            localStorage.removeItem('driverToken')
+          .then((res) => {
+            console.log("HELLO FROM THE OTHER SIIIIIDEEEEEEEE");
+            localStorage.removeItem("driverToken");
             navigator("/driver/login");
           })
           .catch((err) => {
@@ -145,6 +152,8 @@ function DriverDashboard() {
           <h4 className="mt-2">Your account has not been approved.</h4>
         </div>
       )}
+
+      {decodedDriver?.isRegistrationFeePaid && <span>hi hi</span>}
       {decodedDriver?.isAccountApproved &&
         !decodedDriver?.isRegistrationFeePaid && (
           <div className="glass-box d-flex flex-column justify-content-center align-items-center">
@@ -201,6 +210,7 @@ function DriverDashboard() {
                         onClick={() => {
                           setIsPersonalDetails(true);
                           setIsProfessionalDetails(false);
+                          setIsGuarantors(false);
                           setIsCompliance(false);
                           setIsMyVehicle(false);
                           setIsMyPayments(false);
@@ -222,6 +232,7 @@ function DriverDashboard() {
                         onClick={() => {
                           setIsPersonalDetails(false);
                           setIsProfessionalDetails(true);
+                          setIsGuarantors(false);
                           setIsCompliance(false);
                           setIsMyVehicle(false);
                           setIsMyPayments(false);
@@ -239,10 +250,33 @@ function DriverDashboard() {
                     </li>
                     <li>
                       <a
+                        href="#guarantors"
+                        onClick={() => {
+                          setIsPersonalDetails(false);
+                          setIsProfessionalDetails(false);
+                          setIsGuarantors(true);
+                          setIsCompliance(false);
+                          setIsMyVehicle(false);
+                          setIsMyPayments(false);
+                          setIsSettings(false);
+                          setDashboardNavDisplay("none");
+                        }}
+                        style={{
+                          color: isGuarantors ? "#3f69e2" : "#181818",
+                        }}
+                        className="dashboard-nav-category-item d-flex align-items-center"
+                      >
+                        <ShieldCheck size={20} className="me-2" />{" "}
+                        <span className="mt-1">Guarantors</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a
                         href="#compliance"
                         onClick={() => {
                           setIsPersonalDetails(false);
                           setIsProfessionalDetails(false);
+                          setIsGuarantors(false)
                           setIsCompliance(true);
                           setIsMyVehicle(false);
                           setIsMyPayments(false);
@@ -269,6 +303,7 @@ function DriverDashboard() {
                         onClick={() => {
                           setIsPersonalDetails(false);
                           setIsProfessionalDetails(false);
+                          setIsGuarantors(false)
                           setIsCompliance(false);
                           setIsMyVehicle(true);
                           setIsMyPayments(false);
@@ -288,6 +323,7 @@ function DriverDashboard() {
                         onClick={() => {
                           setIsPersonalDetails(false);
                           setIsProfessionalDetails(false);
+                          setIsGuarantors(false)
                           setIsCompliance(false);
                           setIsMyVehicle(false);
                           setIsMyPayments(true);
@@ -310,13 +346,8 @@ function DriverDashboard() {
                       <button
                         className="btn btn-dark blue-bg border-none text-white"
                         onClick={() => {
-                          setIsPersonalDetails(false);
-                          setIsProfessionalDetails(false);
-                          setIsCompliance(false);
-                          setIsMyVehicle(false);
-                          setIsMyPayments(false);
-                          setIsSettings(true);
-                          setDashboardNavDisplay("none");
+                          localStorage.removeItem("driverToken");
+                          navigator("/driver/login");
                         }}
                         style={{
                           color: isSettings ? "#3f69e2" : "#181818",
@@ -370,6 +401,7 @@ function DriverDashboard() {
             {isProfessionalDetails && (
               <ProfessionalDetails driver={decodedDriver} />
             )}
+            {isGuarantors && <Guarantors driver={decodedDriver} />}
             {isCompliance && <Compliance driver={decodedDriver} />}
             {isMyVehicle && <MyVehicle />}
             {isMyPayments && <MyPayments />}
