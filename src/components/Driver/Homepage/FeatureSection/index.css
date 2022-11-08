@@ -1,6 +1,6 @@
 /* FETURES */
 .feature-group {
-    padding: 10px 30px;
+    padding: 10px 60px;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -23,8 +23,8 @@
 }
 
 .feature-image {
-    height: 80%;
-    width: 80%;
+    height: 60%;
+    width: 60%;
     object-fit: contain;
     border-radius: 5px;
 }

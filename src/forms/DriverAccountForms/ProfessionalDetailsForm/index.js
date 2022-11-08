@@ -49,6 +49,7 @@ function ProfessionalDetailsForm({ driver }) {
           driverDetails?.highestAcademicQualification,
         stateOfOrigin: driverDetails?.stateOfOrigin,
         lga: driverDetails?.lga,
+        licenseNumber: driverDetails?.licenseNumber,
         otherHailingPlatforms: driverDetails?.otherHailingPlatforms,
       },
       validationSchema: professionalDetailsSchema,
@@ -131,6 +132,19 @@ function ProfessionalDetailsForm({ driver }) {
             disabled={!isEditing}
           />
           { errors.lga && <small className="error">{ errors.lga }</small> }
+        </div>
+        <div className="form-group form-item">
+          <label htmlFor="licenseNumber">license number</label>
+          <input
+            type="text"
+            name="licenseNumber"
+            id="licenseNumber"
+            value={values.licenseNumber}
+            onChange={handleChange}
+            className="form-control"
+            disabled={!isEditing}
+          />
+          { errors.licenseNumber && <small className="error">{ errors.licenseNumber }</small> }
         </div>
       </div>
       <div className="d-flex justify-content-between align-items-center mt-2">

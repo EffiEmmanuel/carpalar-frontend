@@ -21,6 +21,7 @@ const ApplyToDriveFormSchema = new yup.object().shape({
   highestAcademicQualification: yup.string().required(required),
   stateOfOrigin: yup.string().required(required),
   lga: yup.string().required(required),
+  licenseNumber: yup.string().required(required),
   driversLicense: yup
     .mixed()
     .test({

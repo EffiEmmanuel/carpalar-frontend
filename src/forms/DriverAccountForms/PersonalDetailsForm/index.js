@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 import personalDetailsSchema from './validation'
+import './index.css'
 
 function PersonalDetailsForm({ driver }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -202,13 +203,13 @@ function PersonalDetailsForm({ driver }) {
             name="maritalStatus"
             value={isEditing ? values.maritalStatus : driverDetails?.maritalStatus}
             onChange={handleChange}
-            className="form-control"
+            className="form-control marital-status"
             disabled={!isEditing}
           >
             <option value="" disabled>
               Select
             </option>
-            <option value="single">Single</option>
+            <option value="single" style={{textTransform: 'capitalize !important'}}>Single</option>
             <option value="married">Married</option>
             <option value="divorced">Divorced</option>
           </select>

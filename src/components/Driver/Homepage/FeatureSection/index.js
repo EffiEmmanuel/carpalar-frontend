@@ -3,7 +3,7 @@ import "./index.css";
 
 function FeatureSection({ image, title, description, isFlipped }) {
   return (
-    <div className="feature-group container-fluid m-150">
+    <div className="feature-group container-fluid m-120">
       {isFlipped && (
         <>
           <div className="left">

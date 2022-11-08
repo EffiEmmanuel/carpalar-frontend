@@ -91,7 +91,7 @@ function BecomeAPartner() {
               </Fade>
             </div>
 
-            <div className="choose-your-vehicle m-150">
+            <div className="bap choose-your-vehicle m-150">
               <Fade left delay={100} duration={900}>
                 <div className="left">
                   <h1 className="semibold">
@@ -122,7 +122,7 @@ function BecomeAPartner() {
               </Fade>
             </div>
 
-            <div className="choose-your-vehicle m-150 flipped">
+            <div className="bap choose-your-vehicle m-150 flipped">
               <Fade right delay={100} duration={1000}>
                 <div className="left">
                   <img
@@ -160,7 +160,7 @@ function BecomeAPartner() {
               </Fade>
             </div>
 
-            <div className="choose-your-vehicle m-150">
+            <div className="bap choose-your-vehicle m-150">
               <Fade bottom delay={100} duration={1000}>
                 <div className="left">
                   <h1 className="semibold">
@@ -198,7 +198,7 @@ function BecomeAPartner() {
               </Fade>
             </div>
 
-            <div className="why-invest">
+            <div className="why-invest bap">
               <div className="why-invest-container">
                 <div className="skew-background">
                   <div className="why-invest-content text-align-center">
@@ -208,30 +208,36 @@ function BecomeAPartner() {
                     </h2>
 
                     <Fade bottom delay={200} duration={600}>
-                      <FeatureSection
-                        image={returns}
-                        title="Attractive Returns"
-                        description="Our investment plans provide a whooping Return on Investment."
-                        isFlipped={false}
-                      />
+                      <div className="why-invest-my">
+                        <FeatureSection
+                          image={returns}
+                          title="Attractive Returns"
+                          description="Our investment plans provide a whooping Return on Investment."
+                          isFlipped={false}
+                        />
+                      </div>
                     </Fade>
 
                     <Fade bottom delay={200} duration={600}>
-                      <FeatureSection
-                        image={secure}
-                        title="Trusted &amp; Secured"
-                        description="Funds invested on this platform are secured"
-                        isFlipped={true}
-                      />
+                      <div className="why-invest-my">
+                        <FeatureSection
+                          image={secure}
+                          title="Trusted &amp; Secured"
+                          description="Funds invested on this platform are secured"
+                          isFlipped={true}
+                        />
+                      </div>
                     </Fade>
 
                     <Fade bottom delay={200} duration={600}>
-                      <FeatureSection
-                        image={manage}
-                        title="Professionally managed"
-                        description="Assets are managed professionally to ensure maximum RIO."
-                        isFlipped={false}
-                      />
+                      <div className="why-invest-my">
+                        <FeatureSection
+                          image={manage}
+                          title="Professionally managed"
+                          description="Assets are managed professionally to ensure maximum RIO."
+                          isFlipped={false}
+                        />
+                      </div>
                     </Fade>
                   </div>
                 </div>

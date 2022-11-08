@@ -4,11 +4,10 @@ import carpalarLogo from "../../../assets/images/carpalar-logo.png";
 import {
   BoxArrowLeft,
   Briefcase,
-  Gear,
+  Check,
   Key,
   List,
   Lock,
-  MenuButton,
   PatchCheck,
   Person,
   Wallet2,
@@ -16,13 +15,16 @@ import {
 } from "react-bootstrap-icons";
 import PersonalDetails from "./Account/PersonalDetails";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProfessionalDetails from "./Account/ProfessionalDetails";
 import MyVehicle from "./Business/MyVehicle";
 import Compliance from "./Account/Compliance";
-import MyPaymets from "./Business/MyPayments";
 import { useEffect } from "react";
 import jwtDecode from "jwt-decode";
 import MyPayments from "./Business/MyPayments";
+import PaystackPop from "@paystack/inline-js";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 function DriverDashboard() {
   const [isPersonalDetails, setIsPersonalDetails] = useState(true);
@@ -31,6 +33,9 @@ function DriverDashboard() {
   const [isMyVehicle, setIsMyVehicle] = useState(false);
   const [isMyPayments, setIsMyPayments] = useState(false);
   const [isSettings, setIsSettings] = useState(false);
+
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isTransactionSuccessful, setIsTransactionSuccessful] = useState(false);
 
   // s FUNCTIONALITY
   const [dashboardNavDisplay, setDashboardNavDisplay] = useState("none");
@@ -58,6 +63,80 @@ function DriverDashboard() {
     }
   }, []);
 
+  const navigator = useNavigate();
+
+  const paystackPay = async () => {
+    const paystack = new PaystackPop();
+    const amount = 25000 * 100;
+    console.log("Amount:", amount);
+    console.log("Amount type:", typeof amount);
+    console.log("PAYSTACK:", paystack);
+    paystack.newTransaction({
+      key: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
+      amount: amount,
+      email: decodedDriver?.email,
+      firstname: decodedDriver?.firstname,
+      lastname: decodedDriver?.surname,
+      onSuccess: async (transaction) => {
+        console.log("REF ID:", transaction.reference);
+        setIsVerifying(true);
+        // VERIFY TRANSACTION HERE
+        await axios
+          .get(
+            `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions/verify/${transaction.reference}`
+          )
+          .then((res) => {
+            // SAVE VERIFIED TRANSACTION TO THE DATABASE
+            console.log("RESPONSE FROM VERIFY:", res);
+            return axios.post(
+              `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions`,
+              {
+                transactionId: res.data.transactionDetails?.id,
+                amount: res.data.transactionDetails?.amount,
+                channel: res.data.transactionDetails?.channel,
+                currency: res.data.transactionDetails?.currency,
+                reference: res.data.transactionDetails?.reference,
+                driver: decodedDriver?._id,
+                status: res.data.transactionDetails?.status,
+              }
+            );
+          })
+          .then((res) => {
+            console.log("hi hi hi hi hi 1111");
+            Swal.fire({
+              title: "Success",
+              text: "Payment verified successfully! Redirecting to log in.",
+              icon: "success",
+              timer: 3000,
+            });
+            setIsVerifying(false);
+            setIsTransactionSuccessful(true);
+            return axios.patch(`${process.env.REACT_APP_BASE_URL_DRIVER}/update?driverId=${decodedDriver._id}`, { isApplicationComplete: true }, { 
+              headers: {
+                token: `${localStorage.getItem('driverToken')}`
+              }
+             })
+          })
+          .then(res => {
+            console.log('HELLO FROM THE OTHER SIIIIIDEEEEEEEE');
+            localStorage.removeItem('driverToken')
+            navigator("/driver/login");
+          })
+          .catch((err) => {
+            console.log("ERROR FROM VERIFY:", err);
+            Swal.fire({
+              title: "Error",
+              text: err.response.message,
+              icon: "error",
+              timer: 3000,
+            });
+            setIsVerifying(false);
+            setIsTransactionSuccessful(false);
+          });
+      },
+    });
+  };
+
   return (
     <>
       {!decodedDriver?.isAccountApproved && (
@@ -67,20 +146,25 @@ function DriverDashboard() {
         </div>
       )}
       {decodedDriver?.isAccountApproved &&
-        !decodedDriver?.isApplicationComplete && (
+        !decodedDriver?.isRegistrationFeePaid && (
           <div className="glass-box d-flex flex-column justify-content-center align-items-center">
-            <Lock size={30} />
+            <Check size={60} color="green" />
             <h4 className="mt-3 text-center">
-              Your account has been approved but you need to complete your
-              application before proceeding.
+              Your account has been approved. Please proceed to pay your
+              registration fee.
             </h4>
-            <a
-              href="/driver/complete-registration"
-              role="button"
+            <button
+              // href="/driver/complete-registration"
+              // role="button"
               className="btn btn-dark blue-bg border-none mt-3 px-4 py-2"
+              onClick={() => {
+                paystackPay();
+              }}
             >
-              Proceed
-            </a>
+              {!isVerifying && !isTransactionSuccessful && <span>Pay</span>}
+              {isVerifying && <span>Verifying transaction...</span>}
+              {isTransactionSuccessful && <span>Redirecting...</span>}
+            </button>
           </div>
         )}
 

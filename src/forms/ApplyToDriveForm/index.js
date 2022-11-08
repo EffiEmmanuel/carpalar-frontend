@@ -19,6 +19,8 @@ function ApplyToDriveForm({
   const occupation = ["Self-employed", "Salaried", "Unemployed"];
   const maritalStatus = ["single", "married", "divorced"];
   const [file, setFile] = useState();
+
+  const [licenseName, setLicenseName] = useState('')
   //   const countries = [
   //     "Nigeria",
   //     "Ghana",
@@ -78,6 +80,49 @@ function ApplyToDriveForm({
       });
   };
 
+  const checkLicense = async (e) => {
+    console.log("INSIDE CHECK NIN");
+    if (values.surname === "" || values.firstname === "" || values.dateOfBirth == "" ) {
+      return Swal.fire({
+        title: "Attention",
+        text: "Lastname, firstname and date of birth must be filled first!",
+        icon: "info",
+        timer: 3000,
+      });
+    }
+    if (e.target.value.length === 11) {
+      e.target.disabled = true;
+      await axios
+        .post(
+          `https://vapi.verifyme.ng/v1/verifications/identities/drivers_license/${e.target.value}?type=basic`,
+          {
+            dateOfBirth: values.dateOfBirth,
+            lastname: values.surname,
+            firstname: values.firstname,
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0NzM3MSwiZW52IjoidGVzdCIsImlhdCI6MTY2NjMzOTU4MH0.SxPzE7aZFejgVvknmHsrkJSvBF_Y4mDbOJ6yqUmIryw",
+            },
+          }
+        )
+        .then((res) => {
+          console.log("VERIFYME RESPONSE:", res);
+          if (res.data.data.fieldMatches.lastname) {
+            e.target.disabled = true;
+            setLicenseName('valid and matches details')
+          } else {
+            e.target.disabled = false;
+            setLicenseName('No match! Please cross check your entries (Lastname, firstname and date of birth.')
+          }
+        })
+        .catch((err) => {
+          console.log("VERIFYME ERROR:", err);
+        });
+    }
+  };
+
   const {
     values,
     errors,
@@ -105,6 +150,7 @@ function ApplyToDriveForm({
       highestAcademicQualification: "",
       stateOfOrigin: "",
       lga: "",
+      licenseNumber: "",
       driversLicense: "",
       otherHailingPlatforms: "",
       termsAndConditions: "",
@@ -550,6 +596,29 @@ function ApplyToDriveForm({
             <p className="error">{errors.driversLicense}</p>
           )}
         </div>
+        
+        {/* LICENSE NUMBER */}
+        <div className="form-group">
+          <label htmlFor="licenseNumber">license Number</label>
+          <input
+            type="text"
+            id="licenseNumber"
+            className="form-control"
+            name="licenseNumber"
+            value={values.licenseNumber}
+            placeholder="eg. AA0092998"
+            onChange={(e) => {
+              handleChange(e)
+              checkLicense(e)
+            }}
+            onBlur={handleBlur}
+            disabled={isSubmitting}
+          />
+          {errors.licenseNumber && <p className="error">{errors.licenseNumber}</p>}
+          {licenseName && <label className="">{licenseName}</label>}
+        </div>
+
+        
 
         {/* OTHER HAILING PLATFORMS */}
         <div className="form-group">
