@@ -1,3 +1,36 @@
 .add-guarantor {
-    cursor: pointer;
+  cursor: pointer;
+}
+
+.add-guarantor-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  z-index: 19;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.add-guarantor-container {
+    background-color: #fff;
+    height: 250px;
+    padding: 30px;
+    position: fixed;
+    border-radius: 20px;
+    z-index: 19;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  z-index: 18;
 }

@@ -403,7 +403,7 @@ function DriverDashboard() {
             )}
             {isGuarantors && <Guarantors driver={decodedDriver} />}
             {isCompliance && <Compliance driver={decodedDriver} />}
-            {isMyVehicle && <MyVehicle />}
+            {isMyVehicle && <MyVehicle driver={decodedDriver} />}
             {isMyPayments && <MyPayments />}
             {/* { isSettings && <PersonalDetails />} */}
           </div>

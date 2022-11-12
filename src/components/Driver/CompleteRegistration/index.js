@@ -29,9 +29,7 @@ function CompleteRegistration() {
 
         <div className="apply-description">
           <h1 className="bold apply-header">Welcome to Carpalar</h1>
-          <p>
-            Let's help you complete your registration and get you setup to own your car.
-          </p>
+          <p>Let's help you complete your guarantor request.</p>
         </div>
         <div className="">
           <div className="d-flex flex-column align-items-center opacity-50">
@@ -64,17 +62,17 @@ function CompleteRegistration() {
             }}
             className="apply-steps complete-registration blue-bg step-1"
           ></div>
-          <div
+          {/* <div
             style={{
               opacity: isStepOne ? "0.5" : "1",
             }}
             className="apply-steps complete-registration blue-bg step-2"
-          ></div>
+          ></div> */}
 
           <div
             className="menu-icon-close"
             style={{
-              filter: 'none'
+              filter: "none",
             }}
             onClick={() =>
               Swal.fire({
@@ -85,7 +83,7 @@ function CompleteRegistration() {
                 confirmButtonText: `No, don't cancel`,
                 denyButtonText: `Yes, cancel`,
                 allowOutsideClick: false,
-                closeOnClickOutside: false
+                closeOnClickOutside: false,
               }).then((result) => {
                 if (!result.isConfirmed) {
                   console.log("Result confirmed");
@@ -98,12 +96,7 @@ function CompleteRegistration() {
           </div>
         </div>
 
-        <CompleteRegistrationForm
-          isStepOne={isStepOne}
-          isStepTwo={isStepTwo}
-          setIsStepOne={setIsStepOne}
-          setIsStepTwo={setIsStepTwo}
-        />
+        <CompleteRegistrationForm />
       </div>
     </div>
   );

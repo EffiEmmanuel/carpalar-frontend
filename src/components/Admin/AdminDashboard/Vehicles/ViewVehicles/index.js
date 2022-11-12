@@ -61,10 +61,11 @@ function ViewVehicles() {
     getAllVehicleBrands();
   }, []);
 
+  const [carImage, setCarImage] = useState()
+
   const getImage = (vehicle) => {
     vehicleBrands?.forEach((vehicleBrand) => {
       if (vehicleBrand._id === `${vehicle.vehicleBrand}`) {
-        console.log("YESSS");
         return vehicleBrand.image;
       }
     });

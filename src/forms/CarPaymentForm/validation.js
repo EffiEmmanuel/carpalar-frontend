@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 const required = "*Required";
 
-const CompleteRegistrationSchema = new yup.object().shape({
+const CarPaymentSchema = new yup.object().shape({
   guarantorLastName: yup.string().required(required),
   gurarantorRelationship: yup.string().required(required),
   gurarantorPhone: yup.string().required(required),
@@ -13,4 +13,4 @@ const CompleteRegistrationSchema = new yup.object().shape({
   gurarantorBvn: yup.number('BVN cannot contain alphabets').required(required),
 });
 
-export default CompleteRegistrationSchema;
+export default CarPaymentSchema;

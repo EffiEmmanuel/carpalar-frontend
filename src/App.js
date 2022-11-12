@@ -19,6 +19,7 @@ import AdminDashboard from "./components/Admin/AdminDashboard";
 import AdminLogin from "./components/Admin/AdminLogin";
 import DriverProtectedRoute from "./components/Driver/DriverProtectedRoute";
 import AdminProtectedRoute from "./components/Admin/AdminProtectedRoute";
+import Guarantors from "./components/Driver/DriverDashboard/Account/Guarantors";
 
 export const CarpalarContext = createContext(null);
 
@@ -53,6 +54,7 @@ function App() {
             element={<TermsAndConditions />}
           />
           <Route path="/faqs" element={<Faq />} />
+          <Route path="/driver/register-guarantor" element={<CompleteRegistration />} />
           <Route
             path="/driver/:driverId/verify-phone"
             element={<PhoneVerification />}

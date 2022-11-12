@@ -11,51 +11,27 @@ import { useEffect } from "react";
 import jwtDecode from "jwt-decode";
 import PaystackPop from "@paystack/inline-js";
 
-function CompleteRegistrationForm({
-  isStepOne,
-  isStepTwo,
-  setIsStepOne,
-  setIsStepTwo,
-}) {
+function CompleteRegistrationForm({ driverName }) {
   const navigator = useNavigate();
 
-  const [vehicles, setVehicles] = useState();
-  const [fetchVehiclesError, setFetchVehiclesError] = useState();
-
-  const [guarantorOneNameBvn, setGuarantorOneNameBvn] = useState();
-  const [guarantorTwoNameBvn, setGuarantorTwoNameBvn] = useState();
-  const [guarantorOneNameNin, setGuarantorOneNameNin] = useState();
-  const [guarantorTwoNameNin, setGuarantorTwoNameNin] = useState();
-  const [isVerifying, setIsVerifying] = useState(false);
-
-  const [isTransactionSuccessful, setIsTransactionSuccessful] = useState(false);
+  const [guarantorNameBvn, setGuarantorNameBvn] = useState();
+  const [guarantorNameNin, setGuarantorNameNin] = useState();
+  const [driverId, setDriverId] = useState();
 
   // Get user token: USED TO MAKE SECURE API CALL
+  //
   useEffect(() => {
-    async function getAllVehicles() {
-      await axios
-        .get(`http://localhost:5000/vehicles`)
-        .then((res) => {
-          console.log("RES:", res);
-          if (res.data.vehicles) {
-            setVehicles(res.data.vehicles);
-          }
-        })
-        .catch((err) => {
-          console.log("ERR:", err);
-        });
-    }
-
-    getAllVehicles();
+    // eslint-disable-next-line no-restricted-globals
+    const queryParams = new URLSearchParams(location.search)
+    const driver = queryParams.get('driverId')
+    setDriverId(driver)
   }, []);
   const token = localStorage.getItem("driverToken");
   const decodedDriver = jwtDecode(token);
 
   const onSubmit = async (values) => {
-    if (
-      guarantorOneNameBvn !== guarantorOneNameNin ||
-      guarantorTwoNameBvn !== guarantorTwoNameNin
-    ) {
+    console.log('INSIDE HERE');
+    if (guarantorNameBvn !== guarantorNameNin) {
       return Swal.fire({
         title: "Attention",
         text: "Please cross-check the NINs and BVNs provided! Inconsistent data has been detected!",
@@ -63,39 +39,22 @@ function CompleteRegistrationForm({
         timer: 3000,
       });
     }
-    const guarantorOne = {
-      name: guarantorOneNameBvn,
-      relationship: values.guarantorOneRelationship,
-      phone: values.guarantorOnePhone,
-      address: values.guarantorOneAddress,
-      jobTitle: values.guarantorOneJobTitle,
-      email: values.guarantorOneEmail,
-      nin: values.guarantorOneNin,
-      bvn: values.guarantorOneBvn,
-    };
-
-    const guarantorTwo = {
-      name: guarantorTwoNameBvn,
-      relationship: values.guarantorTwoRelationship,
-      phone: values.guarantorTwoPhone,
-      address: values.guarantorTwoAddress,
-      jobTitle: values.guarantorTwoJobTitle,
-      email: values.guarantorTwoEmail,
-      nin: values.guarantorTwoNin,
-      bvn: values.guarantorTwoBvn,
+    const guarantor = {
+      name: guarantorNameBvn,
+      relationship: values.guarantorRelationship,
+      phone: values.guarantorPhone,
+      address: values.guarantorAddress,
+      jobTitle: values.guarantorJobTitle,
+      email: values.guarantorEmail,
+      nin: values.guarantorNin,
+      bvn: values.guarantorBvn,
+      driver: driverId
     };
 
     await axios
       .patch(
-        `http://localhost:5000/driver/complete-registration?driverId=${decodedDriver._id}`,
-        {
-          guarantorOne,
-          guarantorTwo,
-          vehicle: values.vehicle,
-          comfortableContractDuration: values.comfortableContractDuration,
-          downpaymentBudget: values.downpaymentBudget,
-          otherPaymentAmount: values.otherPaymentAmount,
-        },
+        `${process.env.REACT_APP_BASE_URL_DRIVER}/guarantors/create?driverId=${driverId}`,
+        guarantor,
         {
           headers: {
             authToken: `Bearer ${token}`,
@@ -104,8 +63,8 @@ function CompleteRegistrationForm({
       )
       .then((res) => {
         Swal.fire({
-          title: "Congratulations!🎉",
-          text: "Your application has been completed successfully. Please log in to access your dashboard",
+          title: "Thank you!🎉",
+          text: `You have successfully signed up as ${guarantor.name}'s guarantor. Your personal information remains safe and confidential with us!`,
           icon: "success",
           timer: 4000,
         });
@@ -133,67 +92,6 @@ function CompleteRegistrationForm({
         });
         return true;
       });
-  };
-
-  const paystackPay = async () => {
-    const paystack = new PaystackPop();
-    const amount = +values.downpaymentBudget * 100;
-    console.log("Amount:", amount);
-    console.log("Amount type:", typeof amount);
-    console.log("PAYSTACK:", paystack);
-    paystack.newTransaction({
-      key: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
-      amount: amount,
-      email: decodedDriver?.email,
-      firstname: decodedDriver?.firstname,
-      lastname: decodedDriver?.surname,
-      onSuccess: async (transaction) => {
-        console.log("REF ID:", transaction.reference);
-        setIsVerifying(true);
-        // VERIFY TRANSACTION HERE
-        await axios
-          .get(
-            `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions/verify/${transaction.reference}`
-          )
-          .then((res) => {
-            // SAVE VERIFIED TRANSACTION TO THE DATABASE
-            console.log("RESPONSE FROM VERIFY:", res);
-            return axios.post(
-              `${process.env.REACT_APP_BASE_URL_ADMIN}/transactions`,
-              {
-                transactionId: res.data.transactionDetails.id,
-                amount: res.data.transactionDetails.amount,
-                channel: res.data.transactionDetails.channel,
-                currency: res.data.transactionDetails.currency,
-                reference: res.data.transactionDetails.reference,
-                driver: decodedDriver?._id,
-                status: res.data.transactionDetails.status,
-              }
-            );
-          })
-          .then((res) => {
-            Swal.fire({
-              title: "Success",
-              text: "Payment verified successfully! Please click on the apply button to complete your registration.",
-              icon: "success",
-              timer: 3000,
-            });
-            setIsVerifying(false);
-            setIsTransactionSuccessful(true);
-          })
-          .catch((err) => {
-            console.log("ERROR FROM VERIFY:", err);
-            Swal.fire({
-              title: "Error",
-              text: err.response.message,
-              icon: "error",
-              timer: 3000,
-            });
-            setIsVerifying(false);
-            setIsTransactionSuccessful(false);
-          });
-      },
-    });
   };
 
   const checkNin = async (e, lastname, isGuarantorOne) => {
@@ -225,18 +123,12 @@ function CompleteRegistrationForm({
           console.log("VERIFYME RESPONSE:", res);
           if (res.data.data.fieldMatches.lastname) {
             e.target.disabled = false;
-            isGuarantorOne
-              ? setGuarantorOneNameNin(
-                  `${res.data.data.firstname} ${res.data.data.lastname}`
-                )
-              : setGuarantorTwoNameNin(
-                  `${res.data.data.firstname} ${res.data.data.lastname}`
-                );
+            setGuarantorNameNin(
+              `${res.data.data.firstname} ${res.data.data.lastname}`
+            );
           } else {
             e.target.disabled = false;
-            isGuarantorOne
-              ? setGuarantorOneNameNin(`Lastname did not match provided BVN!`)
-              : setGuarantorTwoNameNin(`Last name did not match provided BVN!`);
+            setGuarantorNameNin(`Lastname did not match provided BVN!`);
           }
         })
         .catch((err) => {
@@ -276,18 +168,12 @@ function CompleteRegistrationForm({
           console.log("VERIFYME RESPONSE:", res);
           if (res.data.data.fieldMatches.lastname) {
             e.target.disabled = false;
-            isGuarantorOne
-              ? setGuarantorOneNameBvn(
-                  `${res.data.data.firstname} ${res.data.data.lastname}`
-                )
-              : setGuarantorTwoNameBvn(
-                  `${res.data.data.firstname} ${res.data.data.lastname}`
-                );
+            setGuarantorNameBvn(
+              `${res.data.data.firstname} ${res.data.data.lastname}`
+            );
           } else {
             e.target.disabled = false;
-            isGuarantorOne
-              ? setGuarantorOneNameBvn(`Lastname did not match provided BVN!`)
-              : setGuarantorTwoNameBvn(`Last name did not match provided BVN!`);
+            setGuarantorNameBvn(`Lastname did not match provided BVN!`);
           }
         })
         .catch((err) => {
@@ -305,28 +191,14 @@ function CompleteRegistrationForm({
     isSubmitting,
   } = useFormik({
     initialValues: {
-      guarantorOneLastName: "",
-      guarantorOneRelationship: "",
-      guarantorOnePhone: "",
-      guarantorOneAddress: "",
-      guarantorOneJobTitle: "",
-      guarantorOneEmail: "",
-      guarantorOneNin: "",
-      guarantorOneBvn: "",
-
-      guarantorTwoLastName: "",
-      guarantorTwoRelationship: "",
-      guarantorTwoPhone: "",
-      guarantorTwoAddress: "",
-      guarantorTwoJobTitle: "",
-      guarantorTwoEmail: "",
-      guarantorTwoNin: "",
-      guarantorTwoBvn: "",
-
-      vehicle: "",
-      comfortableContractDuration: "",
-      downpaymentBudget: "",
-      otherPaymentAmount: "",
+      guarantorLastName: "",
+      guarantorRelationship: "",
+      guarantorPhone: "",
+      guarantorAddress: "",
+      guarantorJobTitle: "",
+      guarantorEmail: "",
+      guarantorNin: "",
+      guarantorBvn: "",
     },
     validationSchema: CompleteRegistrationSchema,
     onSubmit,
@@ -340,7 +212,7 @@ function CompleteRegistrationForm({
       <div
         className="1st-step apply-step"
         style={{
-          display: isStepOne ? "flex" : "none",
+          display: "flex",
           flexDirection: "column",
         }}
         id="step-1"
@@ -349,520 +221,187 @@ function CompleteRegistrationForm({
         <p className="step-description">
           Someone who is willing to vouch for your character and background.
         </p>
+        <p className="error">Please wait for BVN and NIN verification before accepting request!</p>
+        <small className="error">Refresh the page and check your internet connection if verification takes longer than a minute.</small>
 
         <hr className="hr-opacity" />
-        <h5>Guatantor 1</h5>
+        <h5>Guatantor Details</h5>
 
         <div className="form-group mt-3">
-          <label htmlFor="guarantorOneLastName">Lastname</label>
+          <label htmlFor="guarantorLastName">Lastname</label>
           <input
             type="text"
-            id="guarantorOneLastName"
+            id="guarantorLastName"
             className="form-control"
-            name="guarantorOneLastName"
-            value={values.guarantorOneLastName}
+            name="guarantorLastName"
+            value={values.guarantorLastName}
             placeholder="eg. John Doe"
             onChange={handleChange}
             onBlur={handleBlur}
             // disabled={true}
           />
-          {errors.guarantorOneLastName && (
-            <p className="error">{errors.guarantorOneLastName}</p>
+          {errors.guarantorLastName && (
+            <p className="error">{errors.guarantorLastName}</p>
           )}
         </div>
 
         <div className="form-group">
-          <label htmlFor="guarantorOneBvn">bvn</label>
+          <label htmlFor="guarantorBvn">bvn</label>
           <input
             type="text"
-            id="guarantorOneBvn"
+            id="guarantorBvn"
             className="form-control"
-            name="guarantorOneBvn"
-            value={values.guarantorOneBvn}
+            name="guarantorBvn"
+            value={values.guarantorBvn}
             maxLength={11}
             placeholder="********"
             onChange={(e) => {
-              checkBvn(e, values.guarantorOneLastName, true);
+              checkBvn(e, values.guarantorLastName, true);
               handleChange(e);
             }}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneBvn && (
-            <p className="error">{errors.guarantorOneBvn}</p>
+          {errors.guarantorBvn && (
+            <p className="error">{errors.guarantorBvn}</p>
           )}
-          {guarantorOneNameBvn && <label>{guarantorOneNameBvn}</label>}
+          {guarantorNameBvn && <label>{guarantorNameBvn}</label>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="guarantorOneNin">nin</label>
+          <label htmlFor="guarantorNin">nin</label>
           <input
             type="text"
-            id="guarantorOneNin"
+            id="guarantorNin"
             className="form-control"
-            name="guarantorOneNin"
-            value={values.guarantorOneNin}
+            name="guarantorNin"
+            value={values.guarantorNin}
             placeholder="********"
             maxLength={11}
             minLength={11}
             onChange={(e) => {
-              checkNin(e, values.guarantorOneLastName, true);
+              checkNin(e, values.guarantorLastName, true);
               // checkBvn(e);
               handleChange(e);
             }}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneNin && (
-            <p className="error">{errors.guarantorOneNin}</p>
+          {errors.guarantorNin && (
+            <p className="error">{errors.guarantorNin}</p>
           )}
-          {guarantorOneNameNin && <label>{guarantorOneNameNin}</label>}
+          {guarantorNameNin && <label>{guarantorNameNin}</label>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="guarantorOneRelationship">relationship</label>
+          <label htmlFor="guarantorRelationship">relationship</label>
           <input
             type="text"
-            id="guarantorOneRelationship"
+            id="guarantorRelationship"
             className="form-control"
-            name="guarantorOneRelationship"
-            value={values.guarantorOneRelationship}
+            name="guarantorRelationship"
+            value={values.guarantorRelationship}
             placeholder="eg. Brother"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneRelationship && (
-            <p className="error">{errors.guarantorOneRelationship}</p>
+          {errors.guarantorRelationship && (
+            <p className="error">{errors.guarantorRelationship}</p>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="guarantorOnePhone">phone</label>
+          <label htmlFor="guarantorPhone">phone</label>
           <input
             type="tel"
-            id="guarantorOnePhone"
+            id="guarantorPhone"
             className="form-control"
-            name="guarantorOnePhone"
-            value={values.guarantorOnePhone}
+            name="guarantorPhone"
+            value={values.guarantorPhone}
             placeholder="eg. +234"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOnePhone && (
-            <p className="error">{errors.guarantorOnePhone}</p>
+          {errors.guarantorPhone && (
+            <p className="error">{errors.guarantorPhone}</p>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="guarantorOneAddress">home address</label>
+          <label htmlFor="guarantorAddress">home address</label>
           <input
             type="text"
-            id="guarantorOneAddress"
+            id="guarantorAddress"
             className="form-control"
-            name="guarantorOneAddress"
-            value={values.guarantorOneAddress}
+            name="guarantorAddress"
+            value={values.guarantorAddress}
             placeholder="eg. 123 example street..."
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneAddress && (
-            <p className="error">{errors.guarantorOneAddress}</p>
+          {errors.guarantorAddress && (
+            <p className="error">{errors.guarantorAddress}</p>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="guarantorOneJobTitle">Job title</label>
+          <label htmlFor="guarantorJobTitle">Job title</label>
           <input
             type="tel"
-            id="guarantorOneJobTitle"
+            id="guarantorJobTitle"
             className="form-control"
-            name="guarantorOneJobTitle"
-            value={values.guarantorOneJobTitle}
+            name="guarantorJobTitle"
+            value={values.guarantorJobTitle}
             placeholder="eg. Lawyer"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneJobTitle && (
-            <p className="error">{errors.guarantorOneJobTitle}</p>
+          {errors.guarantorJobTitle && (
+            <p className="error">{errors.guarantorJobTitle}</p>
           )}
         </div>
         <div className="form-group">
-          <label htmlFor="guarantorOneEmail">email</label>
+          <label htmlFor="guarantorEmail">email</label>
           <input
             type="email"
-            id="guarantorOneEmail"
+            id="guarantorEmail"
             className="form-control"
-            name="guarantorOneEmail"
-            value={values.guarantorOneEmail}
+            name="guarantorEmail"
+            value={values.guarantorEmail}
             placeholder="eg. johndoe@example.com"
             onChange={handleChange}
             onBlur={handleBlur}
             disabled={isSubmitting}
           />
-          {errors.guarantorOneEmail && (
-            <p className="error">{errors.guarantorOneEmail}</p>
+          {errors.guarantorEmail && (
+            <p className="error">{errors.guarantorEmail}</p>
           )}
         </div>
-
-        <hr className="hr-opacity mt-5" />
-        <h5>Guatantor 2</h5>
-
-        <div className="form-group mt-3">
-          <label htmlFor="guarantorTwoLastName">Lastname</label>
-          <input
-            type="text"
-            id="guarantorTwoLastName"
-            className="form-control"
-            name="guarantorTwoLastName"
-            value={values.guarantorTwoLastName}
-            placeholder="eg. John Doe"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoLastName && (
-            <p className="error">{errors.guarantorTwoLastName}</p>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="guarantorTwoBvn">bvn</label>
-          <input
-            type="text"
-            id="guarantorTwoBvn"
-            className="form-control"
-            name="guarantorTwoBvn"
-            value={values.guarantorTwoBvn}
-            placeholder="********"
-            maxLength={11}
-            minLength={11}
-            onChange={(e) => {
-              checkBvn(e, values.guarantorTwoLastName, false);
-              handleChange(e);
-            }}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoBvn && (
-            <p className="error">{errors.guarantorTwoBvn}</p>
-          )}
-          {guarantorTwoNameBvn && <label>{guarantorTwoNameBvn}</label>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="guarantorTwoNin">nin</label>
-          <input
-            type="text"
-            id="guarantorTwoNin"
-            className="form-control"
-            name="guarantorTwoNin"
-            value={values.guarantorTwoNin}
-            placeholder="********"
-            maxLength={11}
-            minLength={11}
-            onChange={(e) => {
-              checkNin(e, values.guarantorTwoLastName, false);
-              handleChange(e);
-            }}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoNin && (
-            <p className="error">{errors.guarantorTwoNin}</p>
-          )}
-          {guarantorTwoNameNin && <label>{guarantorTwoNameNin}</label>}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoRelationship">relationship</label>
-          <input
-            type="text"
-            id="guarantorTwoRelationship"
-            className="form-control"
-            name="guarantorTwoRelationship"
-            value={values.guarantorTwoRelationship}
-            placeholder="eg. Sister"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoRelationship && (
-            <p className="error">{errors.guarantorTwoRelationship}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoPhone">phone</label>
-          <input
-            type="tel"
-            id="guarantorTwoPhone"
-            className="form-control"
-            name="guarantorTwoPhone"
-            value={values.guarantorTwoPhone}
-            placeholder="eg. +234"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoPhone && (
-            <p className="error">{errors.guarantorTwoPhone}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoAddress">home address</label>
-          <input
-            type="text"
-            id="guarantorTwoAddress"
-            className="form-control"
-            name="guarantorTwoAddress"
-            value={values.guarantorTwoAddress}
-            placeholder="eg. 123 example street..."
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoAddress && (
-            <p className="error">{errors.guarantorTwoAddress}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoJobTitle">Job title</label>
-          <input
-            type="text"
-            id="guarantorTwoJobTitle"
-            className="form-control"
-            name="guarantorTwoJobTitle"
-            value={values.guarantorTwoJobTitle}
-            placeholder="eg. Banker"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoJobTitle && (
-            <p className="error">{errors.guarantorTwoJobTitle}</p>
-          )}
-        </div>
-        <div className="form-group">
-          <label htmlFor="guarantorTwoEmail">email</label>
-          <input
-            type="email"
-            id="guarantorTwoEmail"
-            className="form-control"
-            name="guarantorTwoEmail"
-            value={values.guarantorTwoEmail}
-            placeholder="eg. johndoe@example.com"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          />
-          {errors.guarantorTwoEmail && (
-            <p className="error">{errors.guarantorTwoEmail}</p>
-          )}
-        </div>
-      </div>
-
-      <div
-        className="2nd-step apply-step"
-        style={{
-          display: isStepTwo ? "flex" : "none",
-          flexDirection: "column",
-        }}
-      >
-        <h2 className="semibold">
-          Now, let's take your car and payment details
-        </h2>
-        <p className="step-description">
-          Please select your desired car and pick a payment plan most suitable
-          for you.
-        </p>
-
-        {/* OCCUPATION */}
-        <div className="form-group mt-5">
-          <label htmlFor="vehicle">choose your vehicle</label>
-
-          <select
-            className="form-control"
-            id="vehicle"
-            name="vehicle"
-            value={values.vehicle}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          >
-            <optgroup>
-              <option value="" disabled={isSubmitting}>
-                Select vehicle
-              </option>
-              {vehicles?.map((vehicle) => (
-                <option key={vehicle?._id} value={`${vehicle?._id}`}>
-                  {vehicle?.name} - ₦
-                  {new Intl.NumberFormat("en-US").format(vehicle?.price)}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-          {errors.vehicle && <p className="error">{errors.vehicle}</p>}
-        </div>
-
-        {!values.vehicle == "" && (
-          <div className="form-group">
-            <a
-              href={`/explore-cars/${values.vehicle}`}
-              rel="noreferrer"
-              target="_blank"
-            >
-              SEE VEHICLE DETAILS
-            </a>
-          </div>
-        )}
-
-        {/* COMFORTABLE CONTRACT DURATION */}
-        <div className="form-group mt-5">
-          <label htmlFor="comfortableContractDuration">Contract duration</label>
-          <select
-            className="form-control"
-            id="comfortableContractDuration"
-            name="comfortableContractDuration"
-            value={values.comfortableContractDuration}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          >
-            <optgroup>
-              <option value="" disabled={isSubmitting}>
-                Select
-              </option>
-              <option value="24 month">24 Month</option>
-              <option value="27 month">27 Month</option>
-            </optgroup>
-          </select>
-          {errors.comfortableContractDuration && (
-            <p className="error">{errors.comfortableContractDuration}</p>
-          )}
-        </div>
-
-        {/* DOWN PAYMENT BUDGET */}
-        <div className="form-group mt-5">
-          <label htmlFor="downpaymentBudget">Down payment budget</label>
-          <select
-            className="form-control"
-            id="downpaymentBudget"
-            name="downpaymentBudget"
-            value={values.downpaymentBudget}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            disabled={isSubmitting}
-          >
-            <optgroup>
-              <option value="" disabled={isSubmitting}>
-                Select
-              </option>
-              <option value="400000">₦400,000</option>
-              <option value="500000">₦500,000</option>
-              <option value="700000">₦700,000</option>
-              <option value="1000000">₦1,000,000</option>
-              <option value="other">Other</option>
-            </optgroup>
-          </select>
-          {errors.downpaymentBudget && (
-            <p className="error">{errors.downpaymentBudget}</p>
-          )}
-        </div>
-
-        {values.downpaymentBudget === "other" && (
-          <div className="form-group mt-5">
-            <label htmlFor="downpaymentBudget">
-              Please provide amount below
-            </label>
-            <input
-              type="text"
-              name="otherPaymentAmount"
-              id="otherPaymentAmount"
-              className="form-control"
-              value={values.otherPaymentAmount}
-              onChange={handleChange}
-              onBlur={handleBlur}
-            />
-            {errors.otherPaymentAmount && (
-              <p className="error">{errors.otherPaymentAmount}</p>
-            )}
-          </div>
-        )}
-      </div>
 
       <div className="control-buttons py-5">
         <hr />
         <div className="d-flex justify-content-between align-items-center">
           <div className="back-button-apply">
             <button
-              className="btn semibold back-button py-2 px-4"
-              disabled={isStepOne ? "disabled" : false}
-              onClick={(e) => {
-                e.preventDefault();
-                setIsStepOne(true);
-                setIsStepTwo(false);
-                navigator("#step-1");
-                setTimeout(() => {
-                  window.scrollTo(0, 0);
-                }, 50);
-              }}
+              type="submit"
+              className="btn btn-dark blue-bg py-2 px-4 next-button"
+              disabled={isSubmitting}
+              onClick={() => onSubmit(values)}
             >
-              <span className="arrow mx-2">
-                <ArrowLeft />
-              </span>
-              BACK
+              {isSubmitting && (
+                <span>
+                  <i className="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
+                  <span className="sr-only">Loading...</span>
+                </span>
+              )}
+              {!isSubmitting && <span>Accept request</span>}
             </button>
           </div>
-
-          {!isStepTwo && (
-            <div className="next-button-apply">
-              <button
-                className="btn btn-dark blue-bg py-2 px-4 next-button"
-                disabled={isStepTwo ? "disabled" : false}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsStepTwo(true);
-                  setIsStepOne(false);
-                  navigator("#step-2");
-                  window.scrollTo(0, 0);
-                }}
-              >
-                Next
-              </button>
-            </div>
-          )}
-          {isStepTwo && (
-            <div className="next-button-apply">
-              {isTransactionSuccessful && (
-                <button
-                  type="submit"
-                  className="btn btn-dark blue-bg py-2 px-4 next-button"
-                  disabled={isSubmitting}
-                  onClick={() => onSubmit(values)}
-                >
-                  {isSubmitting && (
-                    <span>
-                      <i className="fa fa-spinner fa-pulse fa-3x fa-fw margin-bottom"></i>
-                      <span className="sr-only">Applying...</span>
-                    </span>
-                  )}
-                  {!isSubmitting && <span>Apply</span>}
-                </button>
-              )}
-              {!isTransactionSuccessful && (
-                <button
-                  type="submit"
-                  className="btn btn-dark blue-bg py-2 px-4 next-button"
-                  disabled={isSubmitting || isVerifying}
-                  onClick={() => paystackPay()}
-                >
-                  {!isVerifying && <span>Make Payment</span>}
-                  {isVerifying && <span>Verifying Payment...</span>}
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
+      </div>
+
     </form>
   );
 }

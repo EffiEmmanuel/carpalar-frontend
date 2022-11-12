@@ -616,6 +616,8 @@ function ApplyToDriveForm({
           />
           {errors.licenseNumber && <p className="error">{errors.licenseNumber}</p>}
           {licenseName && <label className="">{licenseName}</label>}
+          {!licenseName && <label className="">Please wait...</label>}
+          
         </div>
 
         
@@ -741,7 +743,7 @@ function ApplyToDriveForm({
               >
                 {isSubmitting && (
                   <span>
-                    <i className="fa fa-spinner fa-pulse fa-2x fa-fw margin-bottom"></i>
+                    <i className="fa fa-spinner fa-pulse fa-fw margin-bottom"></i>
                     <span className="sr-only">Applying...</span>
                   </span>
                 )}

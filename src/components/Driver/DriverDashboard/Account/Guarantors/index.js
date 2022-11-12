@@ -1,19 +1,23 @@
 import axios from "axios";
+import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import { PlusSquareDotted } from "react-bootstrap-icons";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import * as yup from "yup";
+import PendingApplicationCard from "../../../../Admin/AdminDashboard/Drivers/PendingApplications/PendingApplicationCard";
+import GuarantorCard from "./GuarantorCard";
 import "./index.css";
 
 function Guarantors({ driver }) {
   const [guarantors, setGuarantors] = useState();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigator = useNavigate();
 
   useEffect(() => {
     const driverToken = localStorage.getItem("driverToken");
-
     async function getGuarantors() {
       await axios
         .get(
@@ -43,13 +47,101 @@ function Guarantors({ driver }) {
 
     getGuarantors();
   }, []);
+
+  const onSubmit = async (values, actions) => {
+    await axios
+      .post(
+        `${process.env.REACT_APP_BASE_URL_DRIVER}/guarantors/send-email?driverId=${driver._id}`,
+        values,
+        {
+          headers: {
+            token: `Bearer ${localStorage.getItem("driverToken")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log("RES:", res);
+        Swal.fire({
+          title: "Success",
+          text: res.data.message,
+          icon: "success",
+          timer: 3000,
+        });
+        actions.resetForm();
+      })
+      .catch((err) => {
+        console.log("ERR:", err);
+        Swal.fire({
+          title: "Error",
+          text: err.response.data.message,
+          icon: "error",
+          timer: 3000,
+        });
+      });
+  };
+
+  const addGuarantorSchema = yup.object().shape({
+    guarantorEmail: yup
+      .string()
+      .email("Please provide a valid email address")
+      .required("* Required"),
+  });
+
+  const { values, errors, handleSubmit, handleChange } = useFormik({
+    initialValues: {
+      guarantorEmail: "",
+    },
+    validationSchema: addGuarantorSchema,
+    onSubmit,
+  });
+
   return (
     <div className="account-overview">
-      <div classname='add-guarantor-modal'>
-        <form></form>
+      {isModalOpen && (
+        <div
+          className="add-guarantor-modal"
+          style={{
+            display: isModalOpen ? "block" : "none",
+          }}
+        >
+          <div
+            className="overlay"
+            style={{
+              display: isModalOpen ? "block" : "none",
+            }}
+            onClick={() => setIsModalOpen(false)}
+          ></div>
+          <div className="add-guarantor-container">
+            <h3>Add guarantor</h3>
+            <small>
+              A link would be sent to the email provided. This link expires in 2
+              hours
+            </small>
+            <form classname="form-container" onSubmit={handleSubmit}>
+              <div className="d-flex justify-content-between align-items-center mt-2">
+                <div className="form-group form-item">
+                  <label htmlFor="guarantorEmail">Email Address</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="guarantorEmail"
+                    value={values.guarantorEmail}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <button type="submit" className="btn btn-primary blue-bg mt-2">
+                Send
+              </button>
+            </form>
+          </div>
         </div>
+      )}
       <div className="drivers-pending-applications">
-        <div className="driver-details-header">
+        <h5>Guarantors</h5>
+        <small>Here's all we know about your guarantors.</small>
+        <div className="driver-details-header mt-4">
           <div className="driver-detail">
             <span>Fullname</span>
             <hr className="hr-opacity" />
@@ -74,65 +166,40 @@ function Guarantors({ driver }) {
             <span>Job title</span>
             <hr className="hr-opacity" />
           </div>
-          <div className="driver-detail">
+          {/* <div className="driver-detail">
             <span>bvn</span>
             <hr className="hr-opacity" />
           </div>
           <div className="driver-detail">
             <span>nin</span>
             <hr className="hr-opacity" />
-          </div>
-          <div className="driver-detail">
-            <span>Has approved</span>
-            <hr className="hr-opacity" />
-          </div>
+          </div> */}
         </div>
 
-        {guarantors?.length === 0 && (
+        {guarantors?.map((guarantor) => (
+          <div key={guarantor._id}>
+            <GuarantorCard
+              name={`${guarantor.name}`}
+              gender={guarantor.relationship}
+              phone={guarantor.phone}
+              email={guarantor.email}
+              address={guarantor.address}
+              dateOfBirth={guarantor.jobTitle}
+            />
+          </div>
+        ))}
+
+        {guarantors?.length !== 2 && (
           // <a className="btn btn-primary blue-bg">
           <div className="d-flex justify-content-center align-items-center my-5">
             <PlusSquareDotted
               size={32}
               className="add-guarantor"
-              onClick={() => console.log("hi")}
+              onClick={() => setIsModalOpen(true)}
             />
           </div>
           // </a>
         )}
-
-        {/* {guarantors?.map((pendingApplication) => (
-          <div key={pendingApplication._id}>
-            <PendingApplicationCard
-              _id={pendingApplication._id}
-              name={`${pendingApplication.surname} ${pendingApplication.firstname} ${pendingApplication.othername}`}
-              gender={pendingApplication.gender}
-              address={pendingApplication.address}
-              phone={pendingApplication.phone}
-              email={pendingApplication.email}
-              dateOfBirth={pendingApplication.dateOfBirth}
-              maritalStatus={pendingApplication.maritalStatus}
-              occupation={pendingApplication.occupation}
-              yearsOfDrivingExperience={
-                pendingApplication.yearsOfDrivingExperience
-              }
-              nationality={pendingApplication.nationality}
-              highestAcademicQualification={
-                pendingApplication.highestAcademicQualification
-              }
-              stateOfOrigin={pendingApplication.stateOfOrigin}
-              isDriversLicenseApproved="Yes"
-              isEmailVerified={
-                pendingApplication.isEmailVerified ? "Yes" : "No"
-              }
-              isPhoneVerified={
-                pendingApplication.isPhoneVerified ? "Yes" : "No"
-              }
-              isRegistrationFeePaid={
-                pendingApplication.isRegistrationFeePaid ? "Yes" : "No"
-              }
-            />
-          </div>
-        ))} */}
       </div>
     </div>
   );
